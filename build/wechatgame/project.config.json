@@ -4,23 +4,11 @@
 		"urlCheck": true,
 		"es6": true,
 		"postcss": true,
-		"minified": true,
-		"newFeature": false,
-		"coverView": true,
-		"autoAudits": false,
-		"showShadowRootInWxmlPanel": true,
-		"scopeDataCheck": false,
-		"checkInvalidKey": true,
-		"checkSiteMap": true,
-		"uploadWithSourceMap": true,
-		"babelSetting": {
-			"ignore": [],
-			"disablePlugins": [],
-			"outputPath": ""
-		}
+		"minified": false,
+		"newFeature": false
 	},
 	"compileType": "game",
-	"libVersion": "2.10.3",
+	"libVersion": "game",
 	"appid": "wx8d53a605d532df14",
 	"projectname": "quoridor",
 	"condition": {
@@ -32,10 +20,24 @@
 			"current": -1,
 			"list": []
 		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
 		"game": {
-			"currentL": -1,
-			"list": [],
-			"current": -1
+			"current": -1,
+			"list": [
+				{
+					"id": -1,
+					"name": "jiaru",
+					"query": "type=team2&roomId=KefqYe60",
+					"scene": "1007"
+				}
+			]
+		},
+		"gamePlugin": {
+			"current": -1,
+			"list": []
 		},
 		"miniprogram": {
 			"current": -1,
