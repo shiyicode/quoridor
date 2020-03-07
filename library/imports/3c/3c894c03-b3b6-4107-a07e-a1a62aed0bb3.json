@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "navbar",
+    "texture": "f533c17a-81b0-425e-8016-122884135c8a",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      750,
+      200
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      750,
+      200
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

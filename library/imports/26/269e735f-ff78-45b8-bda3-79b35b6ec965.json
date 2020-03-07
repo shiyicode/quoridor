@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "machine",
+    "texture": "035d5243-a65a-4c93-aaa2-6794a70d09cf",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      398,
+      102
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      398,
+      102
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

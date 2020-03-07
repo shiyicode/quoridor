@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "对勾",
+    "texture": "4071c4c6-59b8-42b6-9275-4f139362d1ca",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      32,
+      28
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      32,
+      28
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}
