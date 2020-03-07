@@ -30,7 +30,6 @@ export default class DevPlatform implements IPlatform {
 
     }
 
-    async getLaunchOptionOnShow() {
-
+    getLaunchOptionOnShow(callback: (query: any, scene: any) => any) {
     }
 }

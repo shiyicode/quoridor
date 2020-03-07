@@ -40,26 +40,30 @@ export default class MenuView extends cc.Component {
 
     // 展示用户信息
     public setUserInfo(avatarUrl: string, nickName: string) {
+        let head = this.playerNode.getChildByName('mask').getChildByName('head')
+        let headBG = head.getComponent(cc.Sprite);
+
+        let name = this.playerNode.getChildByName('name').getComponent(cc.Label);
+
         if (avatarUrl) {
-            let head = this.playerNode.getChildByName('mask').getChildByName('head')
-            let headBG = head.getComponent(cc.Sprite);
-
-            head.active = true;
-
             cc.loader.load({
                 url: avatarUrl,
                 type: 'jpg'
             }, function (err, texture) {
-                console.log("加载头像", err);
                 if (err == null) {
                     headBG.spriteFrame = new cc.SpriteFrame(texture);
                 }
+                head.active = true;
             });
+        } else {
+            head.active = false;
         }
+
         if (nickName) {
             nickName = Util.cutstr(nickName, 5);
-            let name = this.playerNode.getChildByName('name').getComponent(cc.Label);
             name.string = nickName;
+        } else {
+            name.string = "游客";
         }
     }
 

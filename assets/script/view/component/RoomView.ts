@@ -33,6 +33,7 @@ export default class RoomView extends cc.Component {
     }
 
     updateRoom(room: RoomVO) {
+        console.log("更新房间界面");
         let playerNodeArray: Array<cc.Node> = [];
         let playerCnt = Util.getPlayerCntByType(room.gameType);
         if (playerCnt == 2) {
@@ -58,28 +59,36 @@ export default class RoomView extends cc.Component {
     }
 
     public setPlayerInfo(playerNode: cc.Node, avatarUrl: string, nickName: string, isReady: boolean) {
-        if (avatarUrl) {
-            let head = playerNode.getChildByName('mask').getChildByName('head')
-            let headBG = head.getComponent(cc.Sprite);
+        let head = playerNode.getChildByName('mask').getChildByName('head')
+        let headBG = head.getComponent(cc.Sprite);
 
+        let name = playerNode.getChildByName('name').getComponent(cc.Label);
+
+        if (avatarUrl) {
             cc.loader.load({
                 url: avatarUrl,
                 type: 'jpg'
             }, function (err, texture) {
-                console.log("加载头像", err);
                 if (err == null) {
                     headBG.spriteFrame = new cc.SpriteFrame(texture);
-                }            });
-
-            head.active = true;
+                }
+                head.active = true;
+            });
+        } else {
+            head.active = false;
         }
+
         if (nickName) {
             nickName = Util.cutstr(nickName, 5);
-            let name = playerNode.getChildByName('name').getComponent(cc.Label);
             name.string = nickName;
+        } else {
+            name.string = "";
         }
+
         if(isReady != undefined) {
             playerNode.getChildByName('ready_tag').active = isReady;
+        } else {
+            playerNode.getChildByName('ready_tag').active = false;
         }
     }
 

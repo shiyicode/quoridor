@@ -15,8 +15,8 @@ export class RoomVO {
 }
 
 export class PlayerVO {
-    playerID: string;
-    isReady: boolean;
-    avatarUrl: string;
-    nickName: string;
+    playerID: string = "";
+    isReady: boolean = false;
+    avatarUrl: string = "";
+    nickName: string = "";
 }

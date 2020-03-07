@@ -7,7 +7,7 @@ export interface IPlatform {
     getUserInfo(): Promise<any>;
     shareAppMessage(title: string, imageUrl: string, query: string): Promise<any>;
     getLaunchOption(): Promise<any>;
-    getLaunchOptionOnShow(): Promise<any>;
+    getLaunchOptionOnShow(callback: (query: any, scene: any) => any);
 }
 
 let platform: IPlatform;

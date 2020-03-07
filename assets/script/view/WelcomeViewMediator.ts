@@ -1,7 +1,8 @@
-import { Scene, Config } from "../Constants";
+import { Scene, Config, RoomNotification } from "../Constants";
 import UserProxy from "../model/UserProxy";
 import { Platform } from "../services/platform/IPlatform";
 import MgobeService from "../services/mgobe/MgobeService";
+import RoomProxy from "../model/RoomProxy";
 
 export default class WelcomeViewMediator extends puremvc.Mediator implements puremvc.IMediator {
     public static NAME: string = "WelcomeViewMediator";
@@ -73,6 +74,7 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
         const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
 
         let res = await Platform().getLaunchOption();
+        console.log("获取launch参数", res);
         if (res) {
             userProxy.setLaunch(res);
         }
@@ -81,8 +83,10 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
     async registerOnShow() {
         const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
 
-        let res = await Platform().getLaunchOptionOnShow();
-        console.log("onShow", res);
-        userProxy.setLaunch(res);
+        Platform().getLaunchOptionOnShow((query:any, scene:any) => {
+            console.log("再次进入界面OnShow", query, scene);
+            userProxy.setLaunch({query: query, scene: scene});
+            this.facade.sendNotification(RoomNotification.ROOM_RETURN_NOT_CHECK);
+        });
     }
 }

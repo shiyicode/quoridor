@@ -1,7 +1,8 @@
-import { RoomNotification, GameType, Scene } from "../Constants";
+import { RoomNotification, GameType, Scene, WorldNotification } from "../Constants";
 import UserProxy from "../model/UserProxy";
 import MenuView from "../view/component/MenuView";
 import RoomProxy from "../model/RoomProxy";
+import { Platform } from "../services/platform/IPlatform";
 
 
 export default class MenuViewMediator extends puremvc.Mediator implements puremvc.IMediator {
@@ -19,6 +20,7 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
             RoomNotification.ROOM_JOIN_FAIL,
             RoomNotification.ROOM_RETURN_CHECK,
             RoomNotification.ROOM_RETURN_NOT_CHECK,
+            WorldNotification.ACTION_LAUNCH,
         ];
     }
 
@@ -37,11 +39,12 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
                 break;
             case RoomNotification.ROOM_RETURN_CHECK: {
                 // TODO 对已在房间的玩家弹选择框
-                console.log("room return check");
+                console.log("进入已进行中的游戏场景");
                 cc.director.loadScene(Scene.ROOM);
                 break;
             }
-            case RoomNotification.ROOM_RETURN_NOT_CHECK: {
+            case RoomNotification.ROOM_RETURN_NOT_CHECK: {}
+            case WorldNotification.ACTION_LAUNCH: {
                 this.actionByLaunchQuery();
                 break;
             }
@@ -55,11 +58,10 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
     }
 
     public onRegister(): void {
-        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
-
         this.initView();
         this.initCallback();
 
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
         roomProxy.returnRoom();
     }
 
@@ -119,7 +121,7 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
         let launch = userProxy.getLaunch();
         userProxy.setLaunch({});
 
-        console.log("loadByLaunchQuery", launch);
+        console.log("执行获取参数", launch);
         if ((launch && launch.query && launch.scene) && (launch.scene == 1007 || launch.scene == 1008)) {
             switch (launch.query.type as GameType) {
                 case GameType.TEAM2: {
@@ -133,4 +135,5 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
             }
         }
     }
+
 }

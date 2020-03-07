@@ -109,14 +109,6 @@ export class wxApi {
         });
     }
 
-    static async onShow(): Promise<any> {
-        return new Promise(async (resolve, reject) => {
-            wx.onShow((res) => {
-                resolve(res);
-            });
-        });
-    }
-
 
     // static showLoading(title: string = "") {
     //     wx.showLoading({

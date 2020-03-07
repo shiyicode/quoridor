@@ -25,7 +25,6 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
         const data = notification.getBody();
         switch (notification.getName()) {
             case RoomNotification.ROOM_UPDATE: {
-                console.log("notify ====== room_update");
                 let room = roomProxy.getRoom();
                 viewComponent.updateRoom(room);
                 break;

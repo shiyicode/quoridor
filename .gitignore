@@ -11,3 +11,7 @@ output/
 logs/
 .vscode/
 build/
+library/
+local/
+temp/
+template.json

@@ -17,10 +17,10 @@ export default class WXPlatform implements IPlatform {
     }
 
     async authorize() {
-        try {
-            await wxApi.authorize("scope.userInfo");
+        let isAuthorize = await wxApi.authSettingOfUserInfo();
+        if(isAuthorize) {
             console.log('authorize already');
-        } catch (e) {
+        } else {
             console.log("authorize wait");
 
             /** 创建登陆按钮 */
@@ -79,14 +79,13 @@ export default class WXPlatform implements IPlatform {
         }
     }
 
-    async getLaunchOptionOnShow() {
-        let res = await wxApi.onShow();
-        if (res && res.query) {
-            return {
-                query: res.query,
-                scene: res.scene,
-            };
-        }
+    getLaunchOptionOnShow(callback: (query: any, scene: any) => any) {
+        wx.onShow((res) => {
+            if (res && res.query && res.scene) {
+                callback && callback(res.query, res.scene);
+            }
+        });
+
     }
 
 
