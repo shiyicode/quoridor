@@ -1,5 +1,3 @@
-import { UserNotification, RoomNotification } from "../Constants";
-
 export default class UserCommand extends puremvc.SimpleCommand implements puremvc.ICommand {
 
     public constructor() {
@@ -12,7 +10,6 @@ export default class UserCommand extends puremvc.SimpleCommand implements puremv
      * 注册消息
      */
     public register(): void {
-        this.facade.registerCommand(UserNotification.AUTHORIZE, UserCommand);
     }
 
     public execute(notification: puremvc.INotification): void {

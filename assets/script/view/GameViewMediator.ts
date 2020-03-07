@@ -1,4 +1,3 @@
-import { UserNotification } from "../Constants";
 import UserProxy from "../model/UserProxy";
 import GameView from "../view/component/GameView";
 

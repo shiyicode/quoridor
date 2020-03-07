@@ -1,8 +1,7 @@
 export enum WorldNotification {
-    ACTION_LAUNCH = "action_launch",
+    ACTION_LAUNCH = "ACTION_LAUNCH",
     SHOW_LOADING = "SHOW_LOADING",
     HIDE_LOADING = "HIDE_LOADING",
-
     SHOW_TIPS = "SHOW_TIPS",
 
 }
@@ -42,6 +41,11 @@ export enum GameType {
     TEAM4 = "team4",
     MATCH4 = "match4",
     MACHINE4 = "machine4",
+}
+
+export enum WallType {
+    HORIZONTAL = "horizontal",
+    VERTICAL = "vertical",
 }
 
 export enum Scene {

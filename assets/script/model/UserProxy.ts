@@ -24,6 +24,7 @@ export default class UserProxy extends puremvc.Proxy implements puremvc.IProxy {
 
     public getOpenId() {
         return this.user.openId;
+        // return cc.sys.platform + this.user.openId;
     }
 
     public setPlayerId(playerId: string) {
