@@ -36,8 +36,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 126,
-      "height": 14
+      "width": 160,
+      "height": 32
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -75,7 +75,7 @@
   },
   {
     "__type__": "cc.Sprite",
-    "_name": "",
+    "_name": "wall_h<Sprite>",
     "_objFlags": 0,
     "node": {
       "__id__": 1
@@ -89,7 +89,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "a22612d3-b3dc-4ecf-a3fa-89fb0c260b14"
+      "__uuid__": "eb4e1684-6628-410c-8312-17823f885cc2"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -111,7 +111,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "26a4cc82-cfd0-4573-8a4c-1a08e8bf2819"
     },
     "fileId": "b4rWUm36dBSYz9d2yiqkrx",
     "sync": false

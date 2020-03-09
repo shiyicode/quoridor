@@ -63,8 +63,12 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
                     // 初始化成功，跳转到主界面
                     cc.director.loadScene(Scene.MENU);
                 } else {
-                    // TODO 失败，展示重试对话框
                     console.log("initialization fail");
+                    Platform().showModal("提示", (isConfirm) => {
+                        if(isConfirm) {
+                            this.initialization();
+                        }
+                    }, "初始化失败，点击重试", false, "确认");
                 }
             });
     }

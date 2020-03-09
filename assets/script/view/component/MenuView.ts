@@ -8,6 +8,9 @@ const { ccclass, property } = cc._decorator;
 export default class MenuView extends cc.Component {
 
     @property(cc.Node)
+    popupLayer: cc.Node = null;
+
+    @property(cc.Node)
     playerNode: cc.Node = null;
 
     @property(cc.Node)

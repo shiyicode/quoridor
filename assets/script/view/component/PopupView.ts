@@ -2,21 +2,20 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class PopupView extends cc.Component {
-
-    @property(cc.Node)
     loadingNode: cc.Node = null;
 
     onLoad() {
-        // 旋转增量
-
-    }
-
-    start() {
+        this.loadingNode = this.node.getChildByName("loading");
         this.loadingNode.active = false;
     }
 
-    showLoading() {
+    start() {
+    }
+
+    showLoading(isMask: boolean = false) {
         this.loadingNode.active = true;
+        let loadBG: cc.Node = this.loadingNode.getChildByName("loadingBG");
+        loadBG.active = isMask;
     }
 
     hideLoading() {

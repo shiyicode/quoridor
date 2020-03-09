@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "player3",
+    "_name": "player2",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
@@ -46,8 +46,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 204,
-      "height": 74
+      "width": 218,
+      "height": 86
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -58,7 +58,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        230,
+        0,
         500,
         0,
         0,
@@ -114,8 +114,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 71,
-      "height": 71
+      "width": 82,
+      "height": 82
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -126,7 +126,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -64.651,
+        -65.878,
         0,
         0,
         0,
@@ -178,8 +178,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 71,
-      "height": 71
+      "width": 82,
+      "height": 82
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -317,7 +317,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 0,
-      "height": 75.6
+      "height": 73.08
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -328,8 +328,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        31,
-        0,
+        38.212,
+        -1.358,
         0,
         0,
         0,
@@ -369,7 +369,7 @@
     "_useOriginalSize": false,
     "_string": "",
     "_N$string": "",
-    "_fontSize": 60,
+    "_fontSize": 58,
     "_lineHeight": 0,
     "_enableWrapText": true,
     "_N$file": {

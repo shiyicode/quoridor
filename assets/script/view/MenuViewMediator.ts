@@ -25,33 +25,42 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
     }
 
     public handleNotification(notification: puremvc.INotification): void {
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
         const data = notification.getBody();
         switch (notification.getName()) {
             case RoomNotification.ROOM_CREATE_SUCC:
+                Platform().hideLoading();
                 cc.director.loadScene(Scene.ROOM);
                 break;
             case RoomNotification.ROOM_CREATE_FAIL:
+                Platform().hideLoading();
+                Platform().showToast("创建房间失败");
                 break;
             case RoomNotification.ROOM_JOIN_SUCC:
+                Platform().hideLoading();
                 cc.director.loadScene(Scene.ROOM);
                 break;
             case RoomNotification.ROOM_JOIN_FAIL:
+                Platform().hideLoading();
+                Platform().showToast("加入房间失败");
                 break;
             case RoomNotification.ROOM_RETURN_CHECK: {
-                // TODO 对已在房间的玩家弹选择框
-                console.log("进入已进行中的游戏场景");
-                cc.director.loadScene(Scene.ROOM);
+                Platform().hideLoading();
+                Platform().showModal("提示", (isConfirm) => {
+                    if(isConfirm) {
+                        console.log("进入已进行中的游戏");
+                        cc.director.loadScene(Scene.ROOM);
+                    } else {
+                        console.log("忽略已进行中的游戏");
+                        roomProxy.leaveRoom();
+                    }
+                }, "检测到您有对局尚未结束，是否跳转？", true, "确认", "取消");
                 break;
             }
             case RoomNotification.ROOM_RETURN_NOT_CHECK: {}
             case WorldNotification.ACTION_LAUNCH: {
+                Platform().hideLoading();
                 this.actionByLaunchQuery();
-                break;
-            }
-            case RoomNotification.ROOM_RETURN_AGREE: {
-                break;
-            }
-            case RoomNotification.ROOM_RETURN_DISAGREE: {
                 break;
             }
         }
@@ -63,6 +72,7 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
 
         const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
         roomProxy.returnRoom();
+        Platform().showLoading();
     }
 
     public onRemove(): void {
@@ -92,11 +102,13 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
         viewComponent.team2ButtonClick = (event, data) => {
             console.log("team2 button click");
             roomProxy.createRoom(GameType.TEAM2);
+            Platform().showLoading();
         };
 
         viewComponent.team4ButtonClick = (event, data) => {
             console.log("team4 button click");
             roomProxy.createRoom(GameType.TEAM4);
+            Platform().showLoading();
         };
 
         viewComponent.match2ButtonClick = (event, data) => {
@@ -126,6 +138,7 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
             switch (launch.query.type as GameType) {
                 case GameType.TEAM2: {
                     const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+                    Platform().showLoading();
                     roomProxy.joinRoom(launch.query.roomId);
                     break;
                 }
@@ -135,5 +148,4 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
             }
         }
     }
-
 }

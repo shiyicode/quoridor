@@ -32,4 +32,28 @@ export default class DevPlatform implements IPlatform {
 
     getLaunchOptionOnShow(callback: (query: any, scene: any) => any) {
     }
+
+    showLoading(title: string = "", isMask: boolean = false) {
+        console.log("展示Loading", title, isMask);
+    }
+
+    hideLoading() {
+        console.log("隐藏Loading");
+    }
+
+    showToast(title: string, duration: any = 1000) {
+        console.log("展示toast", title, duration);
+    }
+
+    hideToast() {
+        console.log("隐藏Loading");
+    }
+
+    showModal() {
+        console.log("隐藏Loading");
+    }
+
+    hideModal() {
+
+    }
 }

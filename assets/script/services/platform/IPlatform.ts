@@ -8,6 +8,13 @@ export interface IPlatform {
     shareAppMessage(title: string, imageUrl: string, query: string): Promise<any>;
     getLaunchOption(): Promise<any>;
     getLaunchOptionOnShow(callback: (query: any, scene: any) => any);
+    showLoading(title?: string, isMask?: boolean);
+    hideLoading();
+    showToast(title?: string, duration?: any);
+    hideToast();
+    showModal(title:string, callback: (isConfirm: boolean) => any, content?:string, showCancel?:any, confirmText?: any,
+    cancelText?: any);
+    hideModal();
 }
 
 let platform: IPlatform;

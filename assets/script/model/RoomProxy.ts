@@ -34,8 +34,8 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
             if (event.code === MGOBE.ErrCode.EC_OK) {
                 console.log("玩家已在房间中", event);
                 // 如果房间有进行中的游戏，才返回
-                this.setRoom(event.data.roomInfo);
                 this.listenRoom();
+                this.setRoom(event.data.roomInfo);
                 this.facade.sendNotification(RoomNotification.ROOM_RETURN_CHECK);
             } else {
                 console.log("玩家不在房间中");
@@ -90,11 +90,14 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
         });
     }
 
-    // TODO 断线时不应该离开房间，  重回游戏时，如果在游戏中，应提示是否返回游戏
+    // 断线时不应该离开房间，  重回游戏时，如果在游戏中，应提示是否返回游戏
     public leaveRoom() {
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+
         MgobeService.leaveRoom((event) => {
             console.log("离开房间", event);
             if (event.code === MGOBE.ErrCode.EC_OK || event.code === MGOBE.ErrCode.EC_ROOM_PLAYER_NOT_IN_ROOM) {
+                roomProxy.removeListenRoom();
                 this.facade.sendNotification(RoomNotification.ROOM_LEAVE_SUCC);
             } else {
                 this.facade.sendNotification(RoomNotification.ROOM_LEAVE_FAIL);

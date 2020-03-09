@@ -18,7 +18,7 @@ export default class WXPlatform implements IPlatform {
 
     async authorize() {
         let isAuthorize = await wxApi.authSettingOfUserInfo();
-        if(isAuthorize) {
+        if (isAuthorize) {
             console.log('authorize already');
         } else {
             console.log("authorize wait");
@@ -88,11 +88,10 @@ export default class WXPlatform implements IPlatform {
 
     }
 
-
-    async showLoading(title: string = "") {
+    async showLoading(title: string = "加载中", isMask: boolean = true) {
         wx.showLoading({
             title: title,
-            mask: true
+            mask: isMask
         });
     }
 
@@ -112,5 +111,28 @@ export default class WXPlatform implements IPlatform {
     async hideToast() {
         wx.hideToast({
         });
+    }
+
+    showModal(title:string, callback: (isConfirm: boolean) => any, content:string="", showCancel:any = true, confirmText: any="确定",
+    cancelText: any="取消") {
+        wx.showModal({
+            title: title,
+            content: content,
+            showCancel: showCancel,
+            confirmText: confirmText,
+            cancelText: cancelText,
+            success(res) {
+                if (res.confirm) {
+                    callback(true);
+                    // wx.hid
+                } else if (res.cancel) {
+                    callback(false);
+                }
+            }
+        });
+    }
+
+    hideModal() {
+
     }
 }

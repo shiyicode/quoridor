@@ -5,9 +5,6 @@
     ]
   ],
   "excluded-modules": [
-    "Audio",
-    "AudioSource",
-    "Action",
     "Animation",
     "Collider",
     "Dynamic Atlas",
@@ -58,7 +55,7 @@
     "height": 640,
     "width": 960
   },
-  "last-module-event-record-time": 1583089721733,
+  "last-module-event-record-time": 1583704454579,
   "assets-sort-type": "name",
   "facebook": {
     "appID": "",
@@ -69,6 +66,5 @@
     "live": {
       "enable": false
     }
-  },
-  "start-scene": "7d9a64f0-1487-4315-b6d9-6578eb7882ea"
+  }
 }
