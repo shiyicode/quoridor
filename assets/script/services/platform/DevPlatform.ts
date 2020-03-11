@@ -1,5 +1,7 @@
 import { IPlatform } from "./IPlatform";
 import { wxApi } from "../../library/wechat/wxApi";
+import AppFacade from "../../AppFacade";
+import RoomProxy from "../../model/RoomProxy";
 
 export default class DevPlatform implements IPlatform {
     async getOpenID() {
@@ -51,6 +53,10 @@ export default class DevPlatform implements IPlatform {
 
     showModal() {
         console.log("隐藏Loading");
+        console.log("忽略已进行中的游戏");
+        const roomProxy = AppFacade.getInstance().retrieveProxy(RoomProxy.NAME) as RoomProxy;
+
+        roomProxy.leaveRoom();
     }
 
     hideModal() {

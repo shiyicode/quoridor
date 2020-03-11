@@ -49,10 +49,12 @@ export default class RoomView extends cc.Component {
         }
 
         for (let i = 0; i < playerCnt; i++) {
-            this.setPlayerInfo(playerNodeArray[i], room.playersInfo[i].avatarUrl,
-                room.playersInfo[i].nickName, room.playersInfo[i].isReady);
+            if (room.playersInfo[i].playerID && room.playersInfo[i].playerID != "") {
+                this.setPlayerInfo(playerNodeArray[i], room.playersInfo[i].avatarUrl,
+                    room.playersInfo[i].nickName, room.playersInfo[i].isReady);
+            }
         }
-        if(room.playersInfo[0].isReady != undefined) {
+        if (room.playersInfo[0].isReady != undefined) {
             this.readyButton.node.active = !room.playersInfo[0].isReady;
             this.cancelButton.node.active = room.playersInfo[0].isReady;
         }
@@ -85,11 +87,7 @@ export default class RoomView extends cc.Component {
             name.string = "";
         }
 
-        if(isReady != undefined) {
-            playerNode.getChildByName('ready_tag').active = isReady;
-        } else {
-            playerNode.getChildByName('ready_tag').active = false;
-        }
+        playerNode.getChildByName('ready_tag').active = isReady;
     }
 
     readyButtonClick(event, data) { }

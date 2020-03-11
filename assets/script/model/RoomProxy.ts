@@ -1,13 +1,12 @@
-import { RoomVO, PlayerVO } from "./vo/RoomVO";
-import { RoomNotification, GameType } from "../Constants";
+import { RoomVO } from "./vo/RoomVO";
+import { RoomNotification, GameType, RoomStatus, WorldNotification } from "../Constants";
 import Util from "../util/Util";
 import UserProxy from "./UserProxy";
+import { GameVO, PlayerVO, Position } from "./vo/GameVO";
 
 // 只需要在使用 MGOBE 之前 import 一次该文件
 import "../library/mgobe/MGOBE.js";
 import MgobeService from "../services/mgobe/MgobeService";
-
-
 // 直接使用 MGOBE
 const { Room, Listener, ErrCode, ENUM, DebuggerLog } = MGOBE;
 
@@ -33,10 +32,14 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
         MgobeService.getMyRoom((event) => {
             if (event.code === MGOBE.ErrCode.EC_OK) {
                 console.log("玩家已在房间中", event);
-                // 如果房间有进行中的游戏，才返回
-                this.listenRoom();
-                this.setRoom(event.data.roomInfo);
-                this.facade.sendNotification(RoomNotification.ROOM_RETURN_CHECK);
+                // 如果房间有进行中的游戏，才发送消息
+                if (event.data.roomInfo.customPlayerStatus == RoomStatus.START) {
+                    // this.listenRoom();
+                    this.setRoom(event.data.roomInfo);
+                    this.facade.sendNotification(RoomNotification.ROOM_RETURN_CHECK);
+                } else {
+                    this.leaveRoom();
+                }
             } else {
                 console.log("玩家不在房间中");
                 this.facade.sendNotification(RoomNotification.ROOM_RETURN_NOT_CHECK);
@@ -58,11 +61,10 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
             if (event.code === MGOBE.ErrCode.EC_OK) {
                 console.log("加入房间成功", event);
                 this.setRoom(event.data.roomInfo);
-                this.listenRoom();
-                this.facade.sendNotification(RoomNotification.ROOM_JOIN_SUCC);
+                this.facade.sendNotification(RoomNotification.ROOM_JOIN);
             } else {
                 console.log("加入房间失败", event);
-                this.facade.sendNotification(RoomNotification.ROOM_JOIN_FAIL);
+                this.facade.sendNotification(WorldNotification.SHOW_TIPS, { title: "加入房间失败，请重试" });
             }
         });
     }
@@ -81,11 +83,10 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
             if (event.code === MGOBE.ErrCode.EC_OK) {
                 console.log("创建房间成功", event);
                 this.setRoom(event.data.roomInfo);
-                this.listenRoom();
-                this.facade.sendNotification(RoomNotification.ROOM_CREATE_SUCC);
+                this.facade.sendNotification(RoomNotification.ROOM_CREATE);
             } else {
                 console.log("创建房间失败", event);
-                this.facade.sendNotification(RoomNotification.ROOM_CREATE_FAIL);
+                this.facade.sendNotification(WorldNotification.SHOW_TIPS, { title: "创建房间失败，请重试" });
             }
         });
     }
@@ -97,25 +98,40 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
         MgobeService.leaveRoom((event) => {
             console.log("离开房间", event);
             if (event.code === MGOBE.ErrCode.EC_OK || event.code === MGOBE.ErrCode.EC_ROOM_PLAYER_NOT_IN_ROOM) {
-                roomProxy.removeListenRoom();
-                this.facade.sendNotification(RoomNotification.ROOM_LEAVE_SUCC);
+                this.facade.sendNotification(RoomNotification.ROOM_LEAVE);
             } else {
-                this.facade.sendNotification(RoomNotification.ROOM_LEAVE_FAIL);
+                this.facade.sendNotification(WorldNotification.SHOW_TIPS, { title: "离开房间失败，请重试" });
             }
         });
+    }
+
+    public isRoomReady(): boolean {
+        if (this.room.playersInfo[0].isReady) {
+            return true;
+        }
+
+        let playerMaxNum = Util.getPlayerCntByType(this.room.gameType);
+        if (this.room.playersInfo.length != playerMaxNum) {
+            return false;
+        }
+
+
+        for (let i = 0; i < this.room.playersInfo.length; i++) {
+            if (this.room.playersInfo[i].isReady == false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public setReadyStatus(hasReady: boolean) {
         MgobeService.changeCustomPlayerStatus(hasReady ? 1 : 0, (event) => {
             if (event.code === MGOBE.ErrCode.EC_OK) {
             } else {
-                console.log("弹窗，提醒用户重试");
+                this.facade.sendNotification(WorldNotification.SHOW_TIPS, { title: "操作失败，请重试" });
             }
         });
-    }
-
-    public getRoom(): RoomVO {
-        return this.room;
     }
 
     public setRoom(roomInfo: MGOBE.types.RoomInfo) {
@@ -133,46 +149,26 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
             }
         }
 
+        this.room.mePlayerIdx = meIdx;
+
         let playerMaxNum = Util.getPlayerCntByType(this.room.gameType);
         for (let i = 0; i < playerList.length; i++) {
             let new_i = (i + meIdx) % playerMaxNum;
-            this.room.playersInfo[i].playerID = playerList[new_i].id;
-            this.room.playersInfo[i].avatarUrl = playerList[new_i].customProfile;
-            this.room.playersInfo[i].nickName = playerList[new_i].name;
-            this.room.playersInfo[i].isReady = playerList[new_i].customPlayerStatus == 1;
-            console.log("更新用户",i);
-        }
+            let playerInfo = this.room.playersInfo[i];
 
-        for(let i= playerList.length; i < 4; i++) {
-            console.log("重置用户",i);
+            playerInfo.playerID = playerList[new_i].id;
+            playerInfo.avatarUrl = playerList[new_i].customProfile;
+            playerInfo.nickName = playerList[new_i].name;
+            playerInfo.isReady = playerList[new_i].customPlayerStatus == 1;
+        }
+        for (let i = playerList.length; i < 4; i++) {
             this.room.playersInfo[i] = new PlayerVO();
         }
+
+        this.facade.sendNotification(RoomNotification.ROOM_UPDATE);
     }
 
-    public listenRoom() {
-        console.log("启动room监听");
-        // 开启onUpdate监听
-        MgobeService.room.onUpdate = (event) => {
-            console.log("事件回调onUpdate", event.roomInfo);
-            this.setRoom(event.roomInfo);
-            if (!event.roomInfo.playerList.find(player => player.customPlayerStatus !== 1)) {
-                // TODO 全部玩家准备好就跳转Game
-            }
-            this.facade.sendNotification(RoomNotification.ROOM_UPDATE);
-        };
-
-        MgobeService.room.onJoinRoom = (event) => {
-
-        };
-
-        MgobeService.room.onLeaveRoom = (event) => {
-
-        };
-    }
-
-    public removeListenRoom() {
-        console.log("关闭room监听");
-        // 关闭onUpdate监听
-        MgobeService.room.onUpdate = null;
+    public getRoom(): RoomVO {
+        return this.room;
     }
 }

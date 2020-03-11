@@ -2,6 +2,7 @@ import UserProxy from './model/UserProxy';
 import UserCommand from "./controller/UserCommand";
 import RoomProxy from './model/RoomProxy';
 import GameCommand from './controller/GameCommand';
+import GameProxy from './model/GameProxy';
 
 export default class AppFacade extends puremvc.Facade implements puremvc.IFacade {
     public constructor() {
@@ -34,6 +35,7 @@ export default class AppFacade extends puremvc.Facade implements puremvc.IFacade
 
         this.registerProxy(new UserProxy());
         this.registerProxy(new RoomProxy());
+        this.registerProxy(new GameProxy());
     }
 
     // 注册控制器

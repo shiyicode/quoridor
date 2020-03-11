@@ -1,35 +1,29 @@
 export enum WorldNotification {
-    ACTION_LAUNCH = "ACTION_LAUNCH",
     SHOW_LOADING = "SHOW_LOADING",
     HIDE_LOADING = "HIDE_LOADING",
     SHOW_TIPS = "SHOW_TIPS",
 
 }
 
-export enum UserNotification {
-    AUTHORIZE = "AUTHORIZE",
-    AUTHORIZE_SUCC = "AUTHORIZE_SUCC",
-    AUTHORIZE_FAIL = "AUTHORIZE_FAIL",
-}
-
 // TODO 很多FAIL可以考虑用SHOW_TIPS代替
 export enum RoomNotification {
-    ROOM_CREATE_SUCC = "ROOM_CREATE_SUCC",
-    ROOM_CREATE_FAIL = "ROOM_CREATE_FAIL",
-
-    ROOM_JOIN_SUCC = "ROOM_JOIN_SUCC",
-    ROOM_JOIN_FAIL = "ROOM_JOIN_FAIL",
-
-    ROOM_LEAVE_SUCC = "ROOM_LEAVE_SUCC",
-    ROOM_LEAVE_FAIL = "ROOM_LEAVE_FAIL",
-
+    ROOM_CREATE = "ROOM_CREATE",
+    ROOM_JOIN = "ROOM_JOIN",
+    ROOM_LEAVE = "ROOM_LEAVE",
     ROOM_RETURN_CHECK = "ROOM_RETURN_CHECK",  // 提示是否返回当前房间
     ROOM_RETURN_NOT_CHECK = "ROOM_RETURN_NOT_CHECK",  // 不需要提示
-
     ROOM_UPDATE = "ROOM_UPDATE",
 }
 
 export enum GameNotification {
+    GAME_START = "GAME_START",
+    GAME_UPDATE = "GAME_UPDATE",
+}
+
+export enum RoomStatus {
+    WAIT = "WAIT",
+    START = "START",
+    END = "END",
 }
 
 export enum GameType {

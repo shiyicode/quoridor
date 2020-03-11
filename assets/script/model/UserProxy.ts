@@ -4,7 +4,6 @@ export default class UserProxy extends puremvc.Proxy implements puremvc.IProxy {
     public static NAME: string = "UserProxy";
     private static instance: UserProxy = null;
     private user: UserVO = null;
-    private launch: { query, scene } = null;
 
     public static getInstance() {
         if (!this.instance) {
@@ -18,25 +17,8 @@ export default class UserProxy extends puremvc.Proxy implements puremvc.IProxy {
         this.user = new UserVO();
     }
 
-    public setOpenId(openId: string) {
-        this.user.openId = openId;
-    }
-
-    public getOpenId() {
-        return this.user.openId;
-        // return cc.sys.platform + this.user.openId;
-    }
-
-    public setPlayerId(playerId: string) {
-        this.user.playerId = playerId;
-    }
-
-    public getPlayerId() {
-        return this.user.playerId;
-    }
-
+    // 设置用户信息
     public setUserInfo(userInfo: any) {
-        console.log("update user info", userInfo);
         this.user.avatarUrl = userInfo.avatarUrl;
         this.user.nickName = userInfo.nickName;
         this.user.city = userInfo.city;
@@ -52,6 +34,26 @@ export default class UserProxy extends puremvc.Proxy implements puremvc.IProxy {
         };
     }
 
+    // 设置唯一标识
+    public setOpenId(openId: string) {
+        this.user.openId = openId;
+    }
+
+    public getOpenId() {
+        return this.user.openId;
+        // return cc.sys.platform + this.user.openId;
+    }
+
+    // 设置玩家id
+    public setPlayerId(playerId: string) {
+        this.user.playerId = playerId;
+    }
+
+    public getPlayerId() {
+        return this.user.playerId;
+    }
+
+    // 设置菜单模式
     public setModeType(modeType: number) {
         this.user.modeType = modeType;
     }
@@ -60,19 +62,16 @@ export default class UserProxy extends puremvc.Proxy implements puremvc.IProxy {
         return this.user.modeType;
     }
 
-    public hasAuthorize(): boolean {
-        return this.user.openId != null;
-    }
-
+    // 设置启动信息
     public setLaunch(launch) {
-        this.launch = launch;
+        this.user.launch = launch;
     }
 
     public getLaunch() {
-        if (this.launch) {
+        if (this.user.launch) {
             return {
-                query: this.launch.query,
-                scene: this.launch.scene,
+                query: this.user.launch.query,
+                scene: this.user.launch.scene,
             }
         }
     }

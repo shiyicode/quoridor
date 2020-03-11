@@ -33,15 +33,11 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
     public async initialization() {
         const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
 
-        // 获取用户唯一标识
-        // if (!userProxy.getOpenId()) {
-        //     let openId = await Platform().getOpenID();
-        //     userProxy.setOpenId(openId);
-        // }
-
+        // 获取 用户唯一标识
         let openId = await Platform().getOpenID();
         userProxy.setOpenId(openId);
 
+        // 鉴权
         await Platform().authorize();
 
         // 展示loading

@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "player2",
+    "_name": "player1",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
@@ -46,8 +46,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 218,
-      "height": 86
+      "width": 236,
+      "height": 96
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -58,7 +58,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        0,
+        -230,
         500,
         0,
         0,
@@ -114,8 +114,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 82,
-      "height": 82
+      "width": 76,
+      "height": 76
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -126,7 +126,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -65.878,
+        -70,
         0,
         0,
         0,
@@ -178,8 +178,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 82,
-      "height": 82
+      "width": 76,
+      "height": 76
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -231,7 +231,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "ce48243c-51b6-4d91-82a2-c2350aa8dd4a"
+      "__uuid__": "0f2c49db-5448-465b-bca6-622488d87793"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -423,8 +423,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 32,
-      "height": 28
+      "width": 50,
+      "height": 44
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -436,7 +436,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        -70,
+        -100,
         0,
         0,
         0,
@@ -476,7 +476,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "cff5611b-38fc-47f5-9544-e2de356c2390"
+      "__uuid__": "ae979690-3921-41a1-bae8-626cd7b24680"
     },
     "_type": 0,
     "_sizeMode": 1,

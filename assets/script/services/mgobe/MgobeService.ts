@@ -1,10 +1,46 @@
-import { Config } from "../../Constants";
+import { Config, RoomStatus } from "../../Constants";
 import "../../library/mgobe/MGOBE.js";
-import { PlayerVO } from "../../model/vo/RoomVO";
+import { PlayerVO } from "../../model/vo/GameVO";
 
 export default class MgobeService {
     // 将room置为私有 private
     static room: MGOBE.Room = null;
+
+    static startFrameSync(callback?: (event) => any) {
+        if (this.room.roomInfo.frameSyncState !== MGOBE.ENUM.FrameSyncState.START) {
+            this.room.startFrameSync({}, event => {
+                callback && callback(event);
+            });
+        }
+    }
+
+    static stopFrameSync(callback?: (event) => any) {
+        this.room.stopFrameSync({}, event => {
+            callback && callback(event);
+        });
+    }
+
+    static sendFrame(data, callback?: (event) => any) {
+        const sendFramePara: MGOBE.types.SendFramePara = {
+            data: data,
+        };
+
+        this.room.sendFrame(sendFramePara, event => {
+            callback && callback(event);
+        });
+    }
+
+    static sendToClient(msg: string, callback?: (event) => any) {
+        const sendToClientPara: MGOBE.types.SendToClientPara = {
+            recvPlayerList: [],
+            recvType: MGOBE.types.RecvType.ROOM_ALL,
+            msg,
+        };
+
+        this.room.sendToClient(sendToClientPara, event => {
+            callback && callback(event);
+        });
+    }
 
     static getMyRoom(callback?: (event) => any) {
         MGOBE.Room.getMyRoom(event => {
@@ -76,6 +112,14 @@ export default class MgobeService {
         this.room.leaveRoom({}, event => {
             callback && callback(event);
         });
+    }
+
+    static changeRoomStatus(roomStatus: RoomStatus) {
+        const changeRoomPara = {
+            customProperties: roomStatus,
+        };
+
+        this.room.changeRoom(changeRoomPara, event => console.log("changeRoom", roomStatus, event));
     }
 
     static changeCustomPlayerStatus(customPlayerStatus, callback?: (event) => any) {

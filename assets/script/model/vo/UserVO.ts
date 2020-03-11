@@ -1,9 +1,12 @@
 export class UserVO {
-    // 用户唯一标识
-    public openId: string;   // 微信后台用户唯一标识
+    // 微信后台用户唯一标识
+    public openId: string;
+    // MGOBE后台生成的玩家ID
+    public playerId: string;
+    // 用户启动信息
+    public launch: { query, scene } = null;
 
-    public playerId: string; // MGOBE后台生成的玩家ID
-
+    // 用户个人资料
     /** 昵称 */
     public nickName: string;
     /** 头像url */
@@ -17,7 +20,7 @@ export class UserVO {
     /** 国家 */
     public country: string;
 
-    // 模式 2人、4人
+    // 菜单场景当前模式 2人、4人
     public modeType: number = 2;
 
     public constructor() {

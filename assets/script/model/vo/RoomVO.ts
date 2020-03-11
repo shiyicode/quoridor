@@ -1,7 +1,10 @@
 import { GameType } from "../../Constants";
+import { GameVO, PlayerVO } from "./GameVO";
 
 export class RoomVO {
     roomId : string;
+
+    mePlayerIdx: number;
 
     gameType: GameType;
 
@@ -12,11 +15,4 @@ export class RoomVO {
             this.playersInfo.push(new PlayerVO());
         }
     }
-}
-
-export class PlayerVO {
-    playerID: string = "";
-    isReady: boolean = false;
-    avatarUrl: string = "";
-    nickName: string = "";
 }

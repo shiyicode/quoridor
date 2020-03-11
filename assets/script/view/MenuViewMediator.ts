@@ -14,13 +14,11 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
 
     public listNotificationInterests(): string[] {
         return [
-            RoomNotification.ROOM_CREATE_SUCC,
-            RoomNotification.ROOM_CREATE_FAIL,
-            RoomNotification.ROOM_JOIN_SUCC,
-            RoomNotification.ROOM_JOIN_FAIL,
+            RoomNotification.ROOM_CREATE,
+            RoomNotification.ROOM_JOIN,
             RoomNotification.ROOM_RETURN_CHECK,
             RoomNotification.ROOM_RETURN_NOT_CHECK,
-            WorldNotification.ACTION_LAUNCH,
+            WorldNotification.SHOW_TIPS,
         ];
     }
 
@@ -28,28 +26,20 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
         const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
         const data = notification.getBody();
         switch (notification.getName()) {
-            case RoomNotification.ROOM_CREATE_SUCC:
+            case RoomNotification.ROOM_CREATE:
                 Platform().hideLoading();
                 cc.director.loadScene(Scene.ROOM);
                 break;
-            case RoomNotification.ROOM_CREATE_FAIL:
-                Platform().hideLoading();
-                Platform().showToast("创建房间失败");
-                break;
-            case RoomNotification.ROOM_JOIN_SUCC:
+            case RoomNotification.ROOM_JOIN:
                 Platform().hideLoading();
                 cc.director.loadScene(Scene.ROOM);
-                break;
-            case RoomNotification.ROOM_JOIN_FAIL:
-                Platform().hideLoading();
-                Platform().showToast("加入房间失败");
                 break;
             case RoomNotification.ROOM_RETURN_CHECK: {
                 Platform().hideLoading();
                 Platform().showModal("提示", (isConfirm) => {
                     if(isConfirm) {
                         console.log("进入已进行中的游戏");
-                        cc.director.loadScene(Scene.ROOM);
+                        // cc.director.loadScene(Scene.GAME);
                     } else {
                         console.log("忽略已进行中的游戏");
                         roomProxy.leaveRoom();
@@ -57,10 +47,14 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
                 }, "检测到您有对局尚未结束，是否跳转？", true, "确认", "取消");
                 break;
             }
-            case RoomNotification.ROOM_RETURN_NOT_CHECK: {}
-            case WorldNotification.ACTION_LAUNCH: {
+            case RoomNotification.ROOM_RETURN_NOT_CHECK: {
                 Platform().hideLoading();
                 this.actionByLaunchQuery();
+                break;
+            }
+            case WorldNotification.SHOW_TIPS: {
+                Platform().hideLoading();
+                Platform().showToast(data.title);
                 break;
             }
         }

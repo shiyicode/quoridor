@@ -64,7 +64,7 @@
         1,
         1,
         1,
-        1
+        0
       ]
     },
     "_eulerAngles": {
@@ -111,8 +111,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 52,
-      "height": 52
+      "width": 44,
+      "height": 44
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -175,8 +175,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 52,
-      "height": 52
+      "width": 44,
+      "height": 44
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -214,7 +214,7 @@
   },
   {
     "__type__": "cc.Sprite",
-    "_name": "",
+    "_name": "chess<Sprite>",
     "_objFlags": 0,
     "node": {
       "__id__": 3
@@ -228,7 +228,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "e675861d-b323-4359-9c45-d381ae6f90f0"
+      "__uuid__": "1366bc8e-afb1-427f-8e18-f3f01bbafeff"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -313,8 +313,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 72,
-      "height": 72
+      "width": 64,
+      "height": 64
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -352,7 +352,7 @@
   },
   {
     "__type__": "cc.Sprite",
-    "_name": "",
+    "_name": "chess_border<Sprite>",
     "_objFlags": 0,
     "node": {
       "__id__": 8
@@ -369,7 +369,7 @@
       "__uuid__": "275ab6d8-6f50-4ace-b710-ba9593235063"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 2,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -401,14 +401,12 @@
       "__id__": 1
     },
     "_enabled": true,
-    "_normalMaterial": {
-      "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
-    },
+    "_normalMaterial": null,
     "_grayMaterial": null,
     "duration": 0.1,
     "zoomScale": 1.2,
     "clickEvents": [],
-    "_N$interactable": false,
+    "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
     "_N$transition": 3,
     "transition": 3,
@@ -460,9 +458,7 @@
     "_N$hoverSprite": null,
     "hoverSprite": null,
     "_N$disabledSprite": null,
-    "_N$target": {
-      "__id__": 1
-    },
+    "_N$target": null,
     "_id": ""
   },
   {
