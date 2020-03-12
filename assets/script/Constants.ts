@@ -27,8 +27,6 @@ export enum GameAction {
     GIVEUP,
 }
 
-
-
 export enum PlayerStatus {
     UNREADY = 0,
     READY,
@@ -65,6 +63,11 @@ export enum Scene {
     MENU = "menu",
     ROOM = "room",
     GAME = "game",
+}
+
+export enum ChessboardLimit {
+    CHESS_LIMIT = 9, // 棋子格局大小限制为9
+    WALL_LIMIT = 8, // 墙体格局大小限制为棋子格局减1
 }
 
 export const Config = {
