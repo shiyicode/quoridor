@@ -48,11 +48,11 @@ export default class DevPlatform implements IPlatform {
     }
 
     hideToast() {
-        console.log("隐藏Loading");
+        console.log("隐藏Toast");
     }
 
     showModal() {
-        console.log("隐藏Loading");
+        console.log("展示Modal");
         console.log("忽略已进行中的游戏");
         const roomProxy = AppFacade.getInstance().retrieveProxy(RoomProxy.NAME) as RoomProxy;
 

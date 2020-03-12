@@ -20,6 +20,26 @@ export enum GameNotification {
     GAME_UPDATE = "GAME_UPDATE",
 }
 
+export enum GameAction {
+    MOVE_CHESS = 0,
+    ADD_WALL,
+    LEAVE,
+    GIVEUP,
+}
+
+
+
+export enum PlayerStatus {
+    UNREADY = 0,
+    READY,
+    START,
+    LEAVE,
+    GIVEUP,
+    WIN,
+    LOSE,
+}
+
+
 export enum RoomStatus {
     WAIT = "WAIT",
     START = "START",

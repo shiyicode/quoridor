@@ -53,6 +53,7 @@ export default class ChessBoard extends cc.Component {
     touchWallType: WallType;
     touchWallPosition: Position;
     touchStartPosition: Position;
+    isShowHint: boolean;
 
     onLoad() {
         let chessBoardSize = this.node.getContentSize();
@@ -68,12 +69,13 @@ export default class ChessBoard extends cc.Component {
             let chessButton = this.chessNodes[i].getComponent(cc.Button);
             chessButton.interactable = false;
         }
-        this.listenChessBoard();
 
         // this.chessNodes[0].on('click', this.onChessClick, this);
 
         let wallNode = cc.instantiate(this.hWall);
         this.wallNodeWidth = wallNode.getContentSize().width;
+
+        this.isShowHint = false;
     }
 
     updateView(game: GameVO) {
@@ -86,10 +88,17 @@ export default class ChessBoard extends cc.Component {
             this.setChessPosition(this.chessNodes[i], game.playersInfo[i].chessPosition);
         }
 
-        // 如果当前玩家可走，设置当前玩家棋子可点击
         let chessButton = this.chessNodes[0].getComponent(cc.Button);
-        chessButton.interactable = true;
         chessButton.node.on('click', this.onChessClick, this);
+        // 若当前玩家可走子，设置棋子可点击
+
+        if (game.nowPlayerID == game.playersInfo[0].playerID) {
+            this.listenChessBoard();
+            chessButton.interactable = true;
+        } else {
+            this.removeListenChessBoard();
+            chessButton.interactable = false;
+        }
 
         // 更新棋子位置
         for (let i = 0; i < playerCnt; i++) {
@@ -136,7 +145,11 @@ export default class ChessBoard extends cc.Component {
 
     onChessClick(event, data) {
         let positions = this.getAllHintPosition();
-        this.showChessHint(positions);
+        if (this.isShowHint) {
+            this.hideChessHint();
+        } else {
+            this.showChessHint(positions);
+        }
     }
 
     onChessHintClick(event, data) {
@@ -188,6 +201,7 @@ export default class ChessBoard extends cc.Component {
 
             this.hintNodes.push(hintNode);
         }
+        this.isShowHint = true;
     }
 
     hideChessHint() {
@@ -195,6 +209,7 @@ export default class ChessBoard extends cc.Component {
             this.hintNodes[i].destroy();
         }
         this.hintNodes = [];
+        this.isShowHint = false;
     }
 
     setChessPosition(chessNode: cc.Node, position: Position) {
@@ -286,7 +301,6 @@ export default class ChessBoard extends cc.Component {
             return;
         }
 
-
         // 将move的偏移量作用至wall
         this.touchWallNode.position = nowPoint;
         this.touchWallNode.y += this.unit * 10;
@@ -357,14 +371,15 @@ export default class ChessBoard extends cc.Component {
     onChessTouchEnd(event) {
         console.log("onChessTouchEnd");
         console.log("-====", this.touchWallPosition);
-
-        if (this.touchWallPosition.x != -1 && this.touchWallPosition.y != -1) {
-            this.moveWallCallback(this.touchWallPosition, this.touchWallType);
-        }
+        // if (this.touchWallPosition) {
+            if (this.touchWallPosition.x != -1 && this.touchWallPosition.y != -1) {
+                this.moveWallCallback(this.touchWallPosition, this.touchWallType);
+            }
+        // }
 
         this.touchWallNode.destroy();
         this.touchWallShadowNode.destroy();
-
+        this.hideChessHint();
     }
 
     onChessTouchCancel(event) {
@@ -377,6 +392,6 @@ export default class ChessBoard extends cc.Component {
 
         this.touchWallNode.destroy();
         this.touchWallShadowNode.destroy();
-
+        this.hideChessHint();
     }
 }

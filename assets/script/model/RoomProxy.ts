@@ -1,5 +1,5 @@
 import { RoomVO } from "./vo/RoomVO";
-import { RoomNotification, GameType, RoomStatus, WorldNotification } from "../Constants";
+import { RoomNotification, GameType, RoomStatus, WorldNotification, PlayerStatus } from "../Constants";
 import Util from "../util/Util";
 import UserProxy from "./UserProxy";
 import { GameVO, PlayerVO, Position } from "./vo/GameVO";
@@ -31,14 +31,15 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
     public returnRoom() {
         MgobeService.getMyRoom((event) => {
             if (event.code === MGOBE.ErrCode.EC_OK) {
-                console.log("玩家已在房间中", event);
+                this.setRoom(event.data.roomInfo);
                 // 如果房间有进行中的游戏，才发送消息
-                if (event.data.roomInfo.customPlayerStatus == RoomStatus.START) {
-                    // this.listenRoom();
-                    this.setRoom(event.data.roomInfo);
+                if (MgobeService.isStartFrameSync()) {
+                    console.log("玩家所在房间正在游戏中", event);
                     this.facade.sendNotification(RoomNotification.ROOM_RETURN_CHECK);
                 } else {
+                    console.log("玩家所在房间不在游戏中");
                     this.leaveRoom();
+                    this.facade.sendNotification(RoomNotification.ROOM_RETURN_NOT_CHECK);
                 }
             } else {
                 console.log("玩家不在房间中");
@@ -63,6 +64,9 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
                 this.setRoom(event.data.roomInfo);
                 this.facade.sendNotification(RoomNotification.ROOM_JOIN);
             } else {
+                if (event.code == MGOBE.ErrCode.EC_ROOM_PLAYER_ALREADY_IN_ROOM) {
+                    this.leaveRoom();
+                }
                 console.log("加入房间失败", event);
                 this.facade.sendNotification(WorldNotification.SHOW_TIPS, { title: "加入房间失败，请重试" });
             }
@@ -85,6 +89,10 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
                 this.setRoom(event.data.roomInfo);
                 this.facade.sendNotification(RoomNotification.ROOM_CREATE);
             } else {
+                if (event.code == MGOBE.ErrCode.EC_ROOM_PLAYER_ALREADY_IN_ROOM) {
+                    this.leaveRoom();
+                }
+
                 console.log("创建房间失败", event);
                 this.facade.sendNotification(WorldNotification.SHOW_TIPS, { title: "创建房间失败，请重试" });
             }
@@ -111,13 +119,9 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
         }
 
         let playerMaxNum = Util.getPlayerCntByType(this.room.gameType);
-        if (this.room.playersInfo.length != playerMaxNum) {
-            return false;
-        }
 
-
-        for (let i = 0; i < this.room.playersInfo.length; i++) {
-            if (this.room.playersInfo[i].isReady == false) {
+        for (let i = 0; i < playerMaxNum; i++) {
+            if (this.room.playersInfo[i].playerID == "" || this.room.playersInfo[i].isReady == false) {
                 return false;
             }
         }
@@ -126,7 +130,7 @@ export default class RoomProxy extends puremvc.Proxy implements puremvc.IProxy {
     }
 
     public setReadyStatus(hasReady: boolean) {
-        MgobeService.changeCustomPlayerStatus(hasReady ? 1 : 0, (event) => {
+        MgobeService.changeCustomPlayerStatus(hasReady ? PlayerStatus.READY : PlayerStatus.UNREADY, (event) => {
             if (event.code === MGOBE.ErrCode.EC_OK) {
             } else {
                 this.facade.sendNotification(WorldNotification.SHOW_TIPS, { title: "操作失败，请重试" });

@@ -2,7 +2,7 @@ import AppFacade from "../../AppFacade";
 import GameViewMediator from "../GameViewMediator";
 import { GameVO, Position, WallVO } from "../../model/vo/GameVO";
 import Util from "../../util/Util";
-import { GameType, WallType } from "../../Constants";
+import { GameType, WallType, PlayerStatus } from "../../Constants";
 import UserProxy from "../../model/UserProxy";
 
 const { ccclass, property } = cc._decorator;
@@ -21,6 +21,12 @@ export default class GameView extends cc.Component {
 
     @property(cc.Node)
     boxButtonNode: cc.Node = null;
+
+    @property(cc.AudioClip)
+    chessAudio: cc.AudioClip = null;
+
+    @property(cc.AudioClip)
+    wallAudio: cc.AudioClip = null;
 
     onLoad() {
     }
@@ -53,13 +59,74 @@ export default class GameView extends cc.Component {
             }
         }
 
+        this.unscheduleAllCallbacks();
         // 初始化用户信息
         for (let i = 0; i < playerCnt; i++) {
             if (game.playersInfo[i].playerID && game.playersInfo[i].playerID != "") {
                 this.setPlayerInfo(playerNodeArray[i], game.playersInfo[i].avatarUrl,
                     game.playersInfo[i].nickName, game.playersInfo[i].wallLeftCnt);
+
+                // 设置状态
+                let leaveNode = playerNodeArray[i].getChildByName('mask').getChildByName('leave_shadow');
+                let giveupNode = playerNodeArray[i].getChildByName('mask').getChildByName('giveup_shadow');
+                leaveNode.active = false;
+                giveupNode.active = false;
+                if (game.playersInfo[i].status == PlayerStatus.LEAVE) {
+                    leaveNode.active = true;
+                } else if (game.playersInfo[i].status == PlayerStatus.GIVEUP) {
+                    giveupNode.active = true;
+                }
+
+                // 设置计时器
+                let node = playerNodeArray[i].getChildByName('time');
+                let num = node.getChildByName('num').getComponent(cc.Label);
+                let callback = () => {
+                    let nowTime = Date.parse(new Date().toString());
+                    let interval = Math.ceil((nowTime - game.nowActionStartTime) / 1000);
+                    console.log(interval);
+                    if (interval <= game.maxActionDuration) {
+                        num.string = (game.maxActionDuration - interval).toString();
+                        node.active = true;
+                    } else {
+                        this.unschedule(callback);
+                        if (game.nowPlayerID == game.playersInfo[0].playerID) {
+                            this.timeoutCallback();
+                        }
+                    }
+                };
+
+                if (game.nowPlayerID == game.playersInfo[i].playerID) {
+                    console.log("显示", i);
+                    this.schedule(callback, 1, cc.macro.REPEAT_FOREVER, 0);
+                } else {
+                    console.log("关闭", i);
+                    node.active = false;
+                }
             }
         }
+
+
+
+    }
+
+    public timeoutCallback() {
+
+    }
+
+    public setTimeout(playerNode: cc.Node, startTime: number, duration: number) {
+        let node = playerNode.getChildByName('time');
+        let num = node.getChildByName('num').getComponent(cc.Label);
+        let callback = () => {
+            let nowTime = Date.parse(new Date().toString());
+            let interval = Math.ceil((nowTime - startTime) / 1000);
+            console.log(interval);
+            if (interval <= duration) {
+                num.string = (duration - interval).toString();
+                node.active = true;
+            } else {
+                this.unschedule(callback);
+            }
+        };
     }
 
     public setPlayerInfo(playerNode: cc.Node, avatarUrl: string, nickName: string, wallLeftCnt: number) {

@@ -17,7 +17,6 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
         return [
             RoomNotification.ROOM_UPDATE,
             RoomNotification.ROOM_LEAVE,
-            RoomNotification.ROOM_START,
             WorldNotification.SHOW_TIPS,
         ];
     }
@@ -35,9 +34,6 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
             }
             case RoomNotification.ROOM_LEAVE: {
                 cc.director.loadScene(Scene.MENU);
-                break;
-            }
-            case RoomNotification.ROOM_START: {
                 break;
             }
             case WorldNotification.SHOW_TIPS: {
@@ -112,11 +108,14 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
             let room = roomProxy.getRoom();
 
             // 房间已经完成准备
-            if(roomProxy.isRoomReady()) {
-                gameProxy.createGame(room);
+            if(MgobeService.isStartFrameSync()) {
+                console.log("游戏已在进行中，前往Game场景");
+                cc.director.loadScene(Scene.GAME);
+            } else if(roomProxy.isRoomReady()) {
+                // gameProxy.createGame(room);
+                console.log("全部玩家已准备，前往Game场景");
                 cc.director.loadScene(Scene.GAME);
             }
-
             // switch (event.roomInfo.customProperties as RoomStatus) {
             //     case RoomStatus.WAIT: {
             // const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;

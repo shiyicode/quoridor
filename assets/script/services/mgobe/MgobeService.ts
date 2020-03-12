@@ -6,6 +6,10 @@ export default class MgobeService {
     // 将room置为私有 private
     static room: MGOBE.Room = null;
 
+    static isStartFrameSync() {
+        return this.room.roomInfo.frameSyncState == MGOBE.ENUM.FrameSyncState.START;
+    }
+
     static startFrameSync(callback?: (event) => any) {
         if (this.room.roomInfo.frameSyncState !== MGOBE.ENUM.FrameSyncState.START) {
             this.room.startFrameSync({}, event => {
