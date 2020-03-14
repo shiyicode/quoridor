@@ -124,7 +124,7 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
      * @return boolean
      */
     _isChessCanEnd(playerIndex: number, playersPos: Array<Position>, walls: Array<WallVO>, playerCount: number): boolean {
-        let nowPosition = new Position(playersPos[playerIndex].x, playersPos[playerIndex].y);
+        let firstPosition = new Position(playersPos[playerIndex].x, playersPos[playerIndex].y);
         let otherPlayerPos = new Array<Position>();
         for (let i = 0; i < playerCount; i++) {
             if (i !== playerIndex) {
@@ -133,20 +133,20 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
         }
 
         let queue = new Array<Position>();
-        queue.push(nowPosition);
+        queue.push(firstPosition);
 
-        for (let i = 0; queue.length > i; i++) {
-            let nowPosition = queue[i-1];
+        for (let i = 0; i < queue.length; i++) {
+            let nowPosition = queue[i];
 
             let positions = this._getAllLocation(nowPosition, otherPlayerPos, walls);
-            positions.forEach(position => {
-                if(this._isUserEndForZero(playerIndex, position, playerCount)) {
+            for (let j = 0 ; j < positions.length; j++) {
+                if(this._isUserEndForZero(playerIndex, positions[j], playerCount)) {
                     return true;
                 }
-                if(!this._isInQueue(position, positions)) {
-                    queue.push(position);
+                if(!this._isInQueue(positions[j], queue)) {
+                    queue.push(positions[j]);
                 }
-            });
+            }
         }
 
         return false;
@@ -154,11 +154,11 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
 
 
     _isInQueue(position: Position, positions: Array<Position>): boolean {
-        positions.forEach(pos => {
-            if (pos.x == position.x && pos.y == position.y) {
+        for (let i = 0; i < positions.length; i++) {
+            if (positions[i].x == position.x && positions[i].y == position.y) {
                 return true;
             }
-        });
+        }
 
         return false;
     }
@@ -173,7 +173,7 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
     _isUserEndForZero(playerIndex: number, pos: Position, playerCount: number): boolean {
         let rotationMul = 2;
         if (playerCount == 4) {
-            rotationMul = 2;
+            rotationMul = 1;
         }
 
         let rotationCnt = rotationMul * (0 - playerIndex);
