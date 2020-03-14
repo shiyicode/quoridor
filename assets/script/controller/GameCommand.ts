@@ -64,15 +64,15 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
                 otherPlayerPos.push(gameInfo.playersInfo[i].chessPosition);
             }
         }
-        let nowPlayerPos = new Position();
-        nowPlayerPos.x = gameInfo.playersInfo[playerIndex].chessPosition.x;
-        nowPlayerPos.y = gameInfo.playersInfo[playerIndex].chessPosition.y;
 
         let arrivalMap = this.initWallMap(gameInfo.walls);
 
         let legalCoordinate = new Array<Position>();
         // {0，1，2，3}对应{向上，向下，向左，向右}
         for (let directions = 0; directions < 4; directions++) {
+            let nowPlayerPos = new Position();
+            nowPlayerPos.x = gameInfo.playersInfo[playerIndex].chessPosition.x;
+            nowPlayerPos.y = gameInfo.playersInfo[playerIndex].chessPosition.y;
             let locations = this.checkDirection(directions, arrivalMap, otherPlayerPos, nowPlayerPos);
             for (let i = 0; i < locations.length; i++) {
                 legalCoordinate.push(locations[i]);
