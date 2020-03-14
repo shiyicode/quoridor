@@ -87,6 +87,22 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
             ) {
                 return false;
             }
+            if (wallInfo.wallType == WallType.HORIZONTAL &&  walls[i].wallType == WallType.HORIZONTAL) {
+                if (walls[i].position.y == wallInfo.position.y
+                    && ((walls[i].position.x+1 == wallInfo.position.x
+                        || walls[i].position.x-1 == wallInfo.position.x))
+                ){
+                    return false;
+                }
+            }
+            if (wallInfo.wallType == WallType.VERTICAL &&  walls[i].wallType == WallType.VERTICAL) {
+                if (walls[i].position.x == wallInfo.position.x
+                    && ((walls[i].position.y+1 == wallInfo.position.x
+                        || walls[i].position.y-1 == wallInfo.position.x))
+                ){
+                    return false;
+                }
+            }
         }
 
         return true;
