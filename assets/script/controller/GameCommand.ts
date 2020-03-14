@@ -3,6 +3,7 @@ import { GameNotification, GameType, ChessboardLimit, WallType } from "../Consta
 import { GameVO, WallVO, Position } from "../model/vo/GameVO";
 import RoomProxy from "../model/RoomProxy";
 import GameProxy from "../model/GameProxy";
+import Util from "../util/Util";
 // import { Platform } from "../services/platform/IPlatform";
 
 export default class GameCommand extends puremvc.SimpleCommand implements puremvc.ICommand {
@@ -44,17 +45,19 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
     }
 
 
-    isWallLegal(wallInfo: WallVO) {
+    isWallLegal(wallInfo: WallVO, playerID: string) {
         const gameProxy = this.facade.retrieveProxy(GameProxy.NAME) as GameProxy;
         let gameInfo = gameProxy.getGame();
 
-        if (!this._isWallLegal(wallInfo, gameInfo.walls)) {
-            return false;
+        let playerCount = Util.getPlayerCntByType(gameInfo.gameType);
+        for (let i = 0; i < playerCount; i++) {
+            if (playerID == gameInfo.playersInfo[i].playerID && gameInfo.playersInfo[i].wallLeftCnt <= 0) {
+                return false;
+            }
         }
 
-        let playerCount = 2;
-        if (gameInfo.gameType == GameType.TEAM4) {
-                playerCount = 4;
+        if (!this._isWallLegal(wallInfo, gameInfo.walls)) {
+            return false;
         }
 
         let playersPos = new Array<Position>();
@@ -97,8 +100,8 @@ export default class GameCommand extends puremvc.SimpleCommand implements puremv
             }
             if (wallInfo.wallType == WallType.VERTICAL &&  walls[i].wallType == WallType.VERTICAL) {
                 if (walls[i].position.x == wallInfo.position.x
-                    && ((walls[i].position.y+1 == wallInfo.position.x
-                        || walls[i].position.y-1 == wallInfo.position.x))
+                    && ((walls[i].position.y+1 == wallInfo.position.y
+                        || walls[i].position.y-1 == wallInfo.position.y))
                 ){
                     return false;
                 }
