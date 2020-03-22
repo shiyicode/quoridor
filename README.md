@@ -34,14 +34,14 @@
 
 ​	**移动棋子：**
 
-1. 棋子每次只能移动一格，可选择上、下、左、右方位进行移动，不能斜角移动；棋子移动时不能跨越围墙。
+1. 棋子每次只能移动一格，可选择上、下、左、右四个方位进行移动，不能斜角移动；棋子移动不能跨越围墙。
 ![chess_move1](https://github.com/shiyicode/quoridor/blob/master/readme-image/chess_move1.png)
 
-2. 若棋子相邻时，可以跳至相邻棋子的正后方；但不能一次跳过两个及以上数目的棋子。
+2. 若棋子相邻，可以跳至相邻棋子的正后方；但不能一次跳过两个及以上数目的棋子。
 ![chess_move2](https://github.com/shiyicode/quoridor/blob/master/readme-image/chess_move2.png)
 ![chess_move3](https://github.com/shiyicode/quoridor/blob/master/readme-image/chess_move3.png)
 
-3. 若相邻棋子后方有墙时，则可以跳至相邻棋子的左方或右方。
+3. 若相邻棋子后方有墙，则可以跳至相邻棋子的左方或右方。
 ![chess_move4](https://github.com/shiyicode/quoridor/blob/master/readme-image/chess_move4.png)
 ![chess_move5](https://github.com/shiyicode/quoridor/blob/master/readme-image/chess_move5.png)
 
@@ -51,6 +51,6 @@
 
 1. 木板放置不可将任意玩家的所有获胜路线堵死。
 
-2. 木板放置不可重叠，不可交叉。
+2. 木板放置不可重叠、不可交叉。
 
 ![wall_move](https://github.com/shiyicode/quoridor/blob/master/readme-image/wall_move.png)
