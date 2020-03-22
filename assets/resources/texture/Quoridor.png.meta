@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "ef319509-cfb3-4155-a999-c065a9c1e386",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 244,
+  "height": 244,
   "platformSettings": {},
   "subMetas": {
     "Quoridor": {

@@ -4,8 +4,19 @@ import AppFacade from "../../AppFacade";
 import RoomProxy from "../../model/RoomProxy";
 
 export default class DevPlatform implements IPlatform {
+
+    static mockOpenId = ((): string => {
+        let str = Date.now().toString(36);
+
+        for (let i = 0; i < 7; i++) {
+            str += Math.ceil(Math.random() * (10 ** 4)).toString(36);
+        }
+        console.log("随机OpenId", str.substr(str.length-10));
+        return str.substr(str.length-10);
+    })();
+
     async getOpenID() {
-        return "user dev";
+        return DevPlatform.mockOpenId;
     }
 
     async authorize() {
@@ -15,7 +26,7 @@ export default class DevPlatform implements IPlatform {
     async getUserInfo() {
         return {
             avatarUrl: "https://blog.shiyicode.com/image/avatar.png",
-            nickName: "疯逍sadsada",
+            nickName: DevPlatform.mockOpenId,
             gender: 1,
             language: "zh_CN",
             city: "海淀",

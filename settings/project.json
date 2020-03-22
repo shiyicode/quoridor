@@ -12,10 +12,8 @@
     "EditBox",
     "Geom Utils",
     "Intersection",
-    "Layout",
     "Label Effect",
     "Mesh",
-    "MotionStreak",
     "NodePool",
     "Native Socket",
     "Physics",
@@ -27,7 +25,6 @@
     "Renderer Texture",
     "Slider",
     "ScrollBar",
-    "ScrollView",
     "Spine Skeleton",
     "StudioComponent",
     "Toggle",
@@ -66,5 +63,6 @@
     "live": {
       "enable": false
     }
-  }
+  },
+  "start-scene": "current"
 }

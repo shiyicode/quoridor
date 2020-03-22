@@ -1,14 +1,19 @@
-import AppFacade from "../../AppFacade";
+import { BaseUI } from "./BaseUI";
 import WelcomeViewMediator from "../WelcomeViewMediator";
+import AppFacade from "../../AppFacade";
+import { ProjectConfig } from "../../Constants";
+
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class WelcomeView extends cc.Component {
+export class WelcomeView extends BaseUI {
 
-    @property(cc.Node)
-    popupLayer: cc.Node = null;
+    public static NAME = "WelcomeView";
 
+    static getUrl():string {
+        return ProjectConfig.PREFAB_UI_DIR + WelcomeView.NAME;
+    }
 
     start() {
         AppFacade.getInstance().registerMediator(new WelcomeViewMediator(this));
@@ -18,8 +23,7 @@ export default class WelcomeView extends cc.Component {
         AppFacade.getInstance().removeMediator(WelcomeViewMediator.NAME);
     }
 
-    update(dt) {
-
+    onLoad() {
     }
 
 }

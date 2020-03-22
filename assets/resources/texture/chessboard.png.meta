@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "b7e152e4-41c2-4dc8-acba-1990d9b94e8c",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 616,
+  "height": 616,
   "platformSettings": {},
   "subMetas": {
     "chessboard": {

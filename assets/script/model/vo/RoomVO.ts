@@ -1,4 +1,4 @@
-import { GameType } from "../../Constants";
+import { GameType, RoomStatus, RoomStartAction } from "../../Constants";
 import { GameVO, PlayerVO } from "./GameVO";
 
 export class RoomVO {
@@ -8,11 +8,12 @@ export class RoomVO {
 
     gameType: GameType;
 
+    status: RoomStatus;
+
     playersInfo: Array<PlayerVO> = [];
 
+    startAction: RoomStartAction;
+
     public constructor() {
-        for (let i = 0; i < 4; i++) {
-            this.playersInfo.push(new PlayerVO());
-        }
     }
 }

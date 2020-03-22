@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "cae88698-9cbb-4edc-967c-a8979f886f39",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 90,
+  "height": 90,
   "platformSettings": {},
   "subMetas": {
     "box_button": {

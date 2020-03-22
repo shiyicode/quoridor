@@ -1,4 +1,4 @@
-import { RoomNotification, GameType, Scene, WorldNotification } from "../Constants";
+import { RoomNotification, GameType, Scene, WorldNotification, RoomStartAction } from "../Constants";
 import UserProxy from "../model/UserProxy";
 import MenuView from "../view/component/MenuView";
 import RoomProxy from "../model/RoomProxy";
@@ -16,6 +16,7 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
         return [
             RoomNotification.ROOM_CREATE,
             RoomNotification.ROOM_JOIN,
+            RoomNotification.ROOM_MATCH,
             RoomNotification.ROOM_RETURN_CHECK,
             RoomNotification.ROOM_RETURN_NOT_CHECK,
             WorldNotification.SHOW_TIPS,
@@ -31,6 +32,10 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
                 cc.director.loadScene(Scene.ROOM);
                 break;
             case RoomNotification.ROOM_JOIN:
+                Platform().hideLoading();
+                cc.director.loadScene(Scene.ROOM);
+                break;
+            case RoomNotification.ROOM_MATCH:
                 Platform().hideLoading();
                 cc.director.loadScene(Scene.ROOM);
                 break;
@@ -64,9 +69,10 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
         this.initView();
         this.initCallback();
 
-        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
-        roomProxy.returnRoom();
-        Platform().showLoading();
+        // const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+        // roomProxy.returnRoom();
+        // // TODO
+        // Platform().showLoading();
     }
 
     public onRemove(): void {
@@ -92,7 +98,6 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
             userProxy.setModeType(2);
         };
 
-        // TODO 后续多个游戏模式若耦合过多，可以整合为一个callback
         viewComponent.team2ButtonClick = (event, data) => {
             console.log("team2 button click");
             roomProxy.createRoom(GameType.TEAM2);
@@ -107,8 +112,38 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
 
         viewComponent.match2ButtonClick = (event, data) => {
             console.log("match2 button click");
+            roomProxy.initRoom(GameType.MATCH2, RoomStartAction.MATCH);
+            cc.director.loadScene(Scene.ROOM);
+        };
+
+        viewComponent.match4ButtonClick = (event, data) => {
+            console.log("match4 button click");
+            roomProxy.initRoom(GameType.MATCH4, RoomStartAction.MATCH);
+            cc.director.loadScene(Scene.ROOM);
             // this.facade.sendNotification(RoomNotification.ROOM_CREATE, { gameType: GameType.MATCH2 });
         };
+
+        viewComponent.machine2ButtonClick = (event, data) => {
+            console.log("machine2 button click");
+            Platform().showToast("敬请期待！");
+        };
+
+        viewComponent.machine4ButtonClick = (event, data) => {
+            console.log("machine4 button click");
+            Platform().showToast("敬请期待！");
+        };
+
+        viewComponent.shareButtonClick = () => {
+            Platform().shareAppMessage(
+                "墙棋，欧美最风行的棋类游戏，一起来玩吧！",
+                "Eg-pgRbJSpyh-uGwnzdeZQ",
+                "",
+            );
+        }
+
+        viewComponent.helpButtonClick = () => {
+            viewComponent.helpNode.active = true;
+        }
     }
 
     public initView() {
@@ -133,6 +168,16 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
                 case GameType.TEAM2: {
                     const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
                     Platform().showLoading();
+                    console.log("加入房间", launch.query);
+                    roomProxy.initRoom(GameType.TEAM2, RoomStartAction.DEFAULT);
+                    roomProxy.joinRoom(launch.query.roomId);
+                    break;
+                }
+                case GameType.TEAM4: {
+                    const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+                    Platform().showLoading();
+                    console.log("加入房间", launch.query);
+                    roomProxy.initRoom(GameType.TEAM4, RoomStartAction.DEFAULT);
                     roomProxy.joinRoom(launch.query.roomId);
                     break;
                 }

@@ -4,6 +4,7 @@ import { GameVO, Position, WallVO } from "../../model/vo/GameVO";
 import Util from "../../util/Util";
 import { GameType, WallType, PlayerStatus } from "../../Constants";
 import UserProxy from "../../model/UserProxy";
+import { Platform } from "../../services/platform/IPlatform";
 
 const { ccclass, property } = cc._decorator;
 
@@ -18,6 +19,9 @@ export default class GameView extends cc.Component {
 
     @property(cc.Node)
     barNode: cc.Node = null;
+
+    @property(cc.Node)
+    helpNode: cc.Node = null;
 
     @property(cc.Node)
     boxButtonNode: cc.Node = null;
@@ -60,6 +64,9 @@ export default class GameView extends cc.Component {
         }
 
         this.unscheduleAllCallbacks();
+
+        let isEnd = this.showResult(game);
+
         // 初始化用户信息
         for (let i = 0; i < playerCnt; i++) {
             if (game.playersInfo[i].playerID && game.playersInfo[i].playerID != "") {
@@ -68,50 +75,68 @@ export default class GameView extends cc.Component {
 
                 // 设置状态
                 let leaveNode = playerNodeArray[i].getChildByName('mask').getChildByName('leave_shadow');
+                let offlineNode = playerNodeArray[i].getChildByName('mask').getChildByName('offline_shadow');
                 let giveupNode = playerNodeArray[i].getChildByName('mask').getChildByName('giveup_shadow');
                 leaveNode.active = false;
                 giveupNode.active = false;
+                offlineNode.active = false;
+
                 if (game.playersInfo[i].status == PlayerStatus.LEAVE) {
                     leaveNode.active = true;
                 } else if (game.playersInfo[i].status == PlayerStatus.GIVEUP) {
                     giveupNode.active = true;
+                } else if (game.playersInfo[i].status == PlayerStatus.OFFLINE) {
+                    offlineNode.active = true;
                 }
 
-                // 设置计时器
-                let node = playerNodeArray[i].getChildByName('time');
-                let num = node.getChildByName('num').getComponent(cc.Label);
-                let callback = () => {
-                    let nowTime = Date.parse(new Date().toString());
-                    let interval = Math.ceil((nowTime - game.nowActionStartTime) / 1000);
-                    console.log(interval);
-                    if (interval <= game.maxActionDuration) {
-                        num.string = (game.maxActionDuration - interval).toString();
-                        node.active = true;
-                    } else {
-                        this.unschedule(callback);
-                        if (game.nowPlayerID == game.playersInfo[0].playerID) {
+                if (!isEnd) {
+                    // 设置计时器
+                    let node = playerNodeArray[i].getChildByName('time');
+                    let num = node.getChildByName('num').getComponent(cc.Label);
+                    let callback = () => {
+                        let nowTime = Date.parse(new Date().toString());
+                        let interval = Math.ceil((nowTime - game.nowActionStartTime) / 1000);
+                        if (interval <= game.maxActionDuration) {
+                            num.string = (game.maxActionDuration - interval).toString();
+                            node.active = true;
+                        } else {
+                            this.unschedule(callback);
+                            // if (game.nowPlayerID == game.playersInfo[0].playerID) {
                             this.timeoutCallback();
+                            // }
                         }
-                    }
-                };
+                    };
 
-                if (game.nowPlayerID == game.playersInfo[i].playerID) {
-                    console.log("显示", i);
-                    this.schedule(callback, 1, cc.macro.REPEAT_FOREVER, 0);
+                    if (game.nowPlayerID == game.playersInfo[i].playerID) {
+                        this.schedule(callback, 1, cc.macro.REPEAT_FOREVER, 0);
+                    } else {
+                        node.active = false;
+                    }
                 } else {
-                    console.log("关闭", i);
-                    node.active = false;
+                    this.chessBoardLayer.getComponent("ChessboardView").stopView();
                 }
             }
         }
-
-
-
     }
 
-    public timeoutCallback() {
+    public showResult(game: GameVO) {
+        this.barNode.active = false;
 
+        let playerMaxNum = Util.getPlayerCntByType(game.gameType);
+        for (let i = 0; i < playerMaxNum; i++) {
+            if (game.playersInfo[i].status == PlayerStatus.WIN) {
+                let winNode = this.barNode.getChildByName("win_title");
+                let loseNode = this.barNode.getChildByName("lose_title");
+
+                winNode.active = i == 0;
+                loseNode.active = i != 0;
+                this.barNode.active = true;
+                return true;
+            }
+        }
     }
+
+    public timeoutCallback() { }
 
     public setTimeout(playerNode: cc.Node, startTime: number, duration: number) {
         let node = playerNode.getChildByName('time');
@@ -162,6 +187,9 @@ export default class GameView extends cc.Component {
         // playerNode.getChildByName('ready_tag').active = isReady;
     }
 
+    continueButtonClick(event, data) { }
+
+    backButtonClick(event, data) { }
 
     helpButtonClick(event, data) { }
 
@@ -169,10 +197,15 @@ export default class GameView extends cc.Component {
 
     giveupButtonClick(event, data) { }
 
-    chatButtonClick(event, data) { }
+    chatButtonClick(event, data) {
+        Platform().showToast("聊天功能尚未开放，敬请期待！");
+    }
 
     menuButtonClick(event, data) {
         this.boxButtonNode.active = !this.boxButtonNode.active;
     }
 
+    helpNodeLeaveButton(event, data) {
+        this.helpNode.active = false;
+    }
 }

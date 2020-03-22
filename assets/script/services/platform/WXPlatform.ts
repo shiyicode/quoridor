@@ -64,7 +64,7 @@ export default class WXPlatform implements IPlatform {
     async shareAppMessage(title: string, imageUrl: string, query: string) {
         wx.shareAppMessage({
             title: title,
-            imageUrl: imageUrl,
+            imageUrlId: imageUrl,
             query: query,
         });
     }

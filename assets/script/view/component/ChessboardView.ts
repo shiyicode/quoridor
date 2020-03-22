@@ -1,14 +1,3 @@
-// Learn TypeScript:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-
-import { World } from "../Store/World";
 import { GameVO, Position } from "../../model/vo/GameVO";
 import Util from "../../util/Util";
 import { WallType } from "../../Constants";
@@ -76,6 +65,7 @@ export default class ChessBoard extends cc.Component {
         this.wallNodeWidth = wallNode.getContentSize().width;
 
         this.isShowHint = false;
+        this.listenChessBoard();
     }
 
     updateView(game: GameVO) {
@@ -102,17 +92,21 @@ export default class ChessBoard extends cc.Component {
 
         // 更新棋子位置
         for (let i = 0; i < playerCnt; i++) {
-            console.log("===", i, game.playersInfo[i]);
             this.setChessPosition(this.chessNodes[i], game.playersInfo[i].chessPosition);
         }
 
         // 更新墙
         this.clearWall();
 
-        console.log("=-=-=墙总数", game.walls.length);
         for (let i = 0; i < game.walls.length; i++) {
             this.addWall(game.walls[i].position, game.walls[i].wallType);
         }
+    }
+
+    stopView() {
+        this.removeListenChessBoard();
+        let chessButton = this.chessNodes[0].getComponent(cc.Button);
+        chessButton.interactable = false;
     }
 
     setChessView(chessNode: cc.Node, avatarUrl: string) {
@@ -144,10 +138,10 @@ export default class ChessBoard extends cc.Component {
     getAllHintPosition(): any { }
 
     onChessClick(event, data) {
-        let positions = this.getAllHintPosition();
         if (this.isShowHint) {
             this.hideChessHint();
         } else {
+            let positions = this.getAllHintPosition();
             this.showChessHint(positions);
         }
     }
@@ -226,6 +220,7 @@ export default class ChessBoard extends cc.Component {
         for (let i = 0; i < this.wallNodes.length; i++) {
             this.wallNodes[i].destroy();
         }
+        this.wallNodes = [];
     }
 
     addWall(position: Position, wallType: WallType) {
@@ -264,29 +259,32 @@ export default class ChessBoard extends cc.Component {
         this.node.off(cc.Node.EventType.TOUCH_CANCEL, this.onChessTouchCancel, this);
     }
 
+    // 棋盘触控事件回调
     onChessTouchStart(event) {
         console.log("onChessTouchStart");
 
+        // 获取当前触控坐标并转换为棋盘相对坐标
         let worldPoint = event.getLocation();
         let startPoint = this.node.convertToNodeSpaceAR(worldPoint);
 
-
+        // 创建木板投影
         this.touchWallShadowNode = cc.instantiate(this.hWallShadow);
         this.touchWallShadowNode.active = false;
         this.touchWallShadowNode.parent = this.node;
 
+        // 创建拖动木板
         this.touchWallNode = cc.instantiate(this.hWall);
         this.touchWallNode.active = false;
         this.touchWallNode.parent = this.node;
-        // this.touchWallNode.position = startPoint;
-        // this.touchWallNode.y += this.unit * 5;
 
-        // 将锚点放置在0.75
+        // 将锚点放置在0.75，为了木板的横竖切换
         this.touchWallNode.anchorX = 0.75;
 
+        // 初始化拖动木板的类型、坐标
         this.touchWallType = WallType.HORIZONTAL;
         this.touchWallPosition = new Position(-1, -1);
 
+        // 记录起始触控坐标，用于防止误触
         this.touchStartPosition = startPoint;
     }
 
@@ -338,6 +336,7 @@ export default class ChessBoard extends cc.Component {
             }
         }
 
+        // 计算当前木板所在逻辑坐标
         let x: number, y: number;
         if (this.touchWallType == WallType.HORIZONTAL) {
             x = (this.touchWallNode.position.x - this.unit * 4.5 - this.wallNodeWidth * 0.25) / (this.unit * 5);
@@ -370,12 +369,10 @@ export default class ChessBoard extends cc.Component {
 
     onChessTouchEnd(event) {
         console.log("onChessTouchEnd");
-        console.log("-====", this.touchWallPosition);
-        // if (this.touchWallPosition) {
-            if (this.touchWallPosition.x != -1 && this.touchWallPosition.y != -1) {
-                this.moveWallCallback(this.touchWallPosition, this.touchWallType);
-            }
-        // }
+
+        if (this.touchWallPosition.x != -1 && this.touchWallPosition.y != -1) {
+            this.moveWallCallback(this.touchWallPosition, this.touchWallType);
+        }
 
         this.touchWallNode.destroy();
         this.touchWallShadowNode.destroy();
@@ -384,10 +381,9 @@ export default class ChessBoard extends cc.Component {
 
     onChessTouchCancel(event) {
         console.log("onChessTouchCancel");
-        console.log("-====", this.touchWallPosition);
 
         if (this.touchWallPosition.x != -1 && this.touchWallPosition.y != -1) {
-            console.log("取消放置墙");
+            this.moveWallCallback(this.touchWallPosition, this.touchWallType);
         }
 
         this.touchWallNode.destroy();

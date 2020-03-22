@@ -30,6 +30,7 @@ export class PlayerVO {
     avatarUrl: string = "";
     nickName: string = "";
     status: number = 0;
+    value: number = 0;
     public constructor() {
         this.chessPosition = new Position();
     }

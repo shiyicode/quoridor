@@ -1,3 +1,7 @@
+export const ProjectConfig = {
+    PREFAB_UI_DIR: "prefab/",
+}
+
 export enum WorldNotification {
     SHOW_LOADING = "SHOW_LOADING",
     HIDE_LOADING = "HIDE_LOADING",
@@ -10,6 +14,7 @@ export enum RoomNotification {
     ROOM_CREATE = "ROOM_CREATE",
     ROOM_JOIN = "ROOM_JOIN",
     ROOM_LEAVE = "ROOM_LEAVE",
+    ROOM_MATCH = "ROOM_MATCH",
     ROOM_RETURN_CHECK = "ROOM_RETURN_CHECK",  // 提示是否返回当前房间
     ROOM_RETURN_NOT_CHECK = "ROOM_RETURN_NOT_CHECK",  // 不需要提示
     ROOM_UPDATE = "ROOM_UPDATE",
@@ -28,15 +33,20 @@ export enum GameAction {
 }
 
 export enum PlayerStatus {
-    UNREADY = 0,
-    READY,
     START,
     LEAVE,
+    OFFLINE,
     GIVEUP,
     WIN,
     LOSE,
 }
 
+export enum RoomStartAction {
+    DEFAULT = 0,
+    CREATE,
+    JOIN,
+    MATCH,
+}
 
 export enum RoomStatus {
     WAIT = "WAIT",
@@ -82,4 +92,7 @@ export const Config = {
     resendInterval: 1000,      // 重发间隔
     resendTimeout: 10000,      // 重发超时时间
     isDebug: false,            // 是否debug模式
+    matchCode1v1: "match-m7bq0udn",
+    matchCode1v1v1v1: "match-kc5sm7tx",
+
 }

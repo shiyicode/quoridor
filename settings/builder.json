@@ -1,5 +1,9 @@
 {
-  "excludeScenes": [],
+  "excludeScenes": [
+    "2218c349-c191-44d6-8e54-23d4de247179",
+    "1061ee5a-480f-467e-8115-a63d794add55",
+    "fbd0ce36-3bda-4e04-822e-60d4e4d03b5d"
+  ],
   "orientation": {
     "landscapeLeft": true,
     "landscapeRight": true,
@@ -7,7 +11,7 @@
     "upsideDown": false
   },
   "packageName": "org.cocos2d.helloworld",
-  "startScene": "7d9a64f0-1487-4315-b6d9-6578eb7882ea",
+  "startScene": "2d2f792f-a40c-49bb-a189-ed176a246e49",
   "title": "quoridor",
   "webOrientation": "auto",
   "includeSDKBox": false,

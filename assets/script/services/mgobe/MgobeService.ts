@@ -1,4 +1,4 @@
-import { Config, RoomStatus } from "../../Constants";
+import { Config, RoomStatus, GameType } from "../../Constants";
 import "../../library/mgobe/MGOBE.js";
 import { PlayerVO } from "../../model/vo/GameVO";
 
@@ -99,7 +99,7 @@ export default class MgobeService {
         };
 
         const createRoomPara: MGOBE.types.CreateRoomPara = {
-            roomName: "房间名",
+            roomName: roomType,
             maxPlayers: maxPlayers,
             roomType: roomType,
             isPrivate: false,
@@ -108,6 +108,43 @@ export default class MgobeService {
         };
 
         this.room.createRoom(createRoomPara, (event) => {
+            callback && callback(event);
+        });
+    }
+
+    static cancelMatch(callback?: (event) => any) {
+        const cancelMatchPara = {
+            matchType: MGOBE.ENUM.MatchType.PLAYER_COMPLEX,
+        };
+
+        this.room.cancelPlayerMatch(cancelMatchPara, event => {
+            callback && callback(event);
+        });
+    }
+
+    static matchPlayers(player:PlayerVO, maxPlayers: number, roomType: string, callback?: (event) => any) {
+        const playerInfo = {
+            name: player.nickName,
+            customPlayerStatus: 1,
+            customProfile: player.avatarUrl,
+            matchAttributes: [{
+                name: "score",
+                value: player.value,
+            }]
+        };
+
+        let matchCode = Config.matchCode1v1;
+        if(roomType == GameType.MATCH4) {
+            matchCode = Config.matchCode1v1v1v1;
+        }
+
+        const matchPlayersPara = {
+            playerInfo,
+            matchCode: matchCode,
+        };
+
+        // 发起匹配
+        this.room.matchPlayers(matchPlayersPara, event => {
             callback && callback(event);
         });
     }

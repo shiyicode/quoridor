@@ -1,11 +1,19 @@
 import AppFacade from "../../AppFacade";
 import MenuViewMediator from "../MenuViewMediator";
 import Util from "../../util/Util";
+import { ProjectConfig } from "../../Constants";
+import { BaseUI } from "./BaseUI";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class MenuView extends cc.Component {
+export default class MenuView extends BaseUI {
+
+    public static NAME = "MenuView";
+
+    static getUrl():string {
+        return ProjectConfig.PREFAB_UI_DIR + MenuView.NAME;
+    }
 
     @property(cc.Node)
     popupLayer: cc.Node = null;
@@ -19,15 +27,19 @@ export default class MenuView extends cc.Component {
     @property(cc.Node)
     mode4Node: cc.Node = null;
 
+    @property(cc.Node)
+    helpNode: cc.Node = null;
+
+
     onLoad() {
     }
 
     start() {
-        AppFacade.getInstance().registerMediator(new MenuViewMediator(this));
+        // AppFacade.getInstance().registerMediator(new MenuViewMediator(this));
     }
 
     public onDestroy() {
-        AppFacade.getInstance().removeMediator(MenuViewMediator.NAME);
+        // AppFacade.getInstance().removeMediator(MenuViewMediator.NAME);
     }
 
     // 切换游戏模式
@@ -81,6 +93,19 @@ export default class MenuView extends cc.Component {
 
     match2ButtonClick(event, data) { }
 
+    match4ButtonClick(event, data) {}
+
     machine2ButtonClick(event, data) { }
 
+    machine4ButtonClick(event, data) { }
+
+    shareButtonClick(event, data) { }
+
+    helpButtonClick(event, data) { }
+
+    rankButtonClick(event, data) { }
+
+    helpNodeLeaveButton(event, data) {
+        this.helpNode.active = false;
+    }
 }

@@ -1,8 +1,12 @@
-import { Scene, Config, RoomNotification } from "../Constants";
+import { Scene, Config, RoomNotification, WorldNotification } from "../Constants";
 import UserProxy from "../model/UserProxy";
 import { Platform } from "../services/platform/IPlatform";
 import MgobeService from "../services/mgobe/MgobeService";
 import RoomProxy from "../model/RoomProxy";
+import { UIManager } from "../manager/UIManager";
+import MenuView from "./component/MenuView";
+import { WelcomeView } from "./component/WelcomeView";
+import { Tip } from "./component/Tip";
 
 export default class WelcomeViewMediator extends puremvc.Mediator implements puremvc.IMediator {
     public static NAME: string = "WelcomeViewMediator";
@@ -41,7 +45,7 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
         await Platform().authorize();
 
         // 展示loading
-        this.viewComponent.popupLayer.getComponent("PopupView").showLoading();
+        await UIManager.getInstance().showLoadingSync(false);
 
         // 获取用户信息
         if (!userProxy.getUserInfo().avatarUrl) {
@@ -53,13 +57,17 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
         MgobeService.initMgobeSDK(userProxy.getOpenId(), Config.MGOBEGameId, Config.MGOBESecretKey,
             Config.MGOBEHost, "", (res: { code: MGOBE.ErrCode }) => {
                 if (res.code === MGOBE.ErrCode.EC_OK) {
+                    console.log("初始化SDK成功", MGOBE.Player.id);
                     userProxy.setPlayerId(MGOBE.Player.id);
                     // 获取启动参数
                     this.loadLaunchOption();
                     // 初始化成功，跳转到主界面
-                    cc.director.loadScene(Scene.MENU);
+                    UIManager.getInstance().openUISync(MenuView, 0, () => {
+                        UIManager.getInstance().hideLoading();
+                        UIManager.getInstance().closeUI(WelcomeView);
+                    });
                 } else {
-                    console.log("initialization fail");
+                    console.log("初始化SDK失败");
                     Platform().showModal("提示", (isConfirm) => {
                         if(isConfirm) {
                             this.initialization();
@@ -74,7 +82,7 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
         const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
 
         let res = await Platform().getLaunchOption();
-        console.log("获取launch参数", res);
+        console.log("启动时，获取launch参数", res);
         if (res) {
             userProxy.setLaunch(res);
         }

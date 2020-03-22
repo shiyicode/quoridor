@@ -48,8 +48,8 @@ export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
 
     public addWall(playerId, position: Position, wallType: WallType) {
         let playerMaxNum = Util.getPlayerCntByType(this.game.gameType);
-        for(let i=0; i<playerMaxNum; i++) {
-            if(this.game.playersInfo[i].playerID == playerId) {
+        for (let i = 0; i < playerMaxNum; i++) {
+            if (this.game.playersInfo[i].playerID == playerId) {
                 this.game.playersInfo[i].wallLeftCnt--;
             }
         }
@@ -58,9 +58,18 @@ export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
 
     public moveChess(playerId, position: Position) {
         let playerMaxNum = Util.getPlayerCntByType(this.game.gameType);
-        for(let i=0; i<playerMaxNum; i++) {
-            if(this.game.playersInfo[i].playerID == playerId) {
+        for (let i = 0; i < playerMaxNum; i++) {
+            if (this.game.playersInfo[i].playerID == playerId) {
                 this.game.playersInfo[i].chessPosition = position;
+            }
+        }
+    }
+
+    public isEnd() {
+        let playerMaxNum = Util.getPlayerCntByType(this.game.gameType);
+        for (let i = 0; i < playerMaxNum; i++) {
+            if (this.game.playersInfo[i].status == PlayerStatus.WIN) {
+                return true;
             }
         }
     }
@@ -70,17 +79,20 @@ export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
         let playerMaxNum = Util.getPlayerCntByType(this.game.gameType);
         let idx = 0;
         for (let i = 0; i < playerMaxNum; i++) {
+            if (this.game.playersInfo[i].status == PlayerStatus.WIN) {
+                return;
+            }
             if (this.game.nowPlayerID == this.game.playersInfo[i].playerID) {
                 idx = i;
-                break;
             }
         }
-        let newIdx = (idx + 1) % playerMaxNum;
+        // let newIdx = (idx + 1) % playerMaxNum;
 
-        // let newIdx;
-        // do {
-        //    newIdx = (idx + 1) % playerMaxNum;
-        // } while(this.game.playersInfo[newIdx].status == PlayerStatus.START);
+        let newIdx;
+        do {
+            newIdx = (idx + 1) % playerMaxNum;
+        } while (this.game.playersInfo[newIdx].status == PlayerStatus.GIVEUP
+            || this.game.playersInfo[newIdx].status == PlayerStatus.LEAVE);
         this.game.nowPlayerID = this.game.playersInfo[newIdx].playerID;
         this.game.nowActionStartTime = Date.parse(new Date().toString());
     }
@@ -133,8 +145,6 @@ export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
                 gamePlayer.wallLeftCnt = playerMaxNum == 2 ? 10 : 5;
                 gamePlayer.chessPosition = positions[i];
                 gamePlayer.status = PlayerStatus.START;
-
-                console.log("-==-=-", i, gamePlayer, this.game.playersInfo[i]);
             }
         }
         console.log("游戏创建", this.game);
