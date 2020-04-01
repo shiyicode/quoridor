@@ -5,55 +5,54 @@ export default class WXPlatform implements IPlatform {
     async getOpenID() {
         console.log("get openId");
         try {
-            // let res = await wxApi.login();
-            // console.log("login succ", res.code, res);
+            let res = await wxApi.login();
+            console.log("login succ", res.code, res);
 
-            let res = await wxApi.callFunction("login");
+            res = await wxApi.callFunction("login");
             console.log("call login succ", res);
             return res.result.openid;
         } catch (e) {
             console.log("call login fail", e);
+            return "";
         }
     }
 
-    async authorize() {
+    async authSettingOfUserInfo() {
         let isAuthorize = await wxApi.authSettingOfUserInfo();
-        if (isAuthorize) {
-            console.log('authorize already');
-        } else {
-            console.log("authorize wait");
+        return isAuthorize;
+    }
 
-            /** 创建登陆按钮 */
-            let x = window.innerWidth / 2 - 250 / 2;
-            let y = window.innerHeight / 1.2;
-            let button = wx.createUserInfoButton({
-                type: "text",
-                text: "微信登陆",
-                image: "",
-                style: {
-                    left: x,
-                    top: y,
-                    width: 250,
-                    height: 43,
-                    lineHeight: 43,
-                    backgroundColor: "#FC3768",
-                    color: "#ffffff",
-                    textAlign: "center",
-                    fontSize: 18,
-                    borderRadius: 4
+    async createUserInfoButton() {
+        /** 创建登陆按钮 */
+        let x = window.innerWidth / 2 - 250 / 2;
+        let y = window.innerHeight / 1.2;
+        let button = wx.createUserInfoButton({
+            type: "text",
+            text: "微信登陆",
+            image: "",
+            style: {
+                left: x,
+                top: y,
+                width: 250,
+                height: 43,
+                lineHeight: 43,
+                backgroundColor: "#FC3768",
+                color: "#ffffff",
+                textAlign: "center",
+                fontSize: 18,
+                borderRadius: 4
+            }
+        });
+        /** 用户点击登陆按钮后获取userInfo */
+        await new Promise(resolve => {
+            button.onTap((res) => {
+                console.log("authorize finish:", res);
+                if (res.userInfo) {
+                    button.destroy();
+                    resolve();
                 }
             });
-            /** 用户点击登陆按钮后获取userInfo */
-            await new Promise(resolve => {
-                button.onTap((res) => {
-                    console.log("authorize finish:", res);
-                    if (res.userInfo) {
-                        button.destroy();
-                        resolve();
-                    }
-                });
-            });
-        }
+        });
     }
 
     async getUserInfo() {
@@ -61,10 +60,11 @@ export default class WXPlatform implements IPlatform {
         return res.userInfo;
     }
 
-    async shareAppMessage(title: string, imageUrl: string, query: string) {
+    async shareAppMessage(title: string, imageUrl: string, imageUrlId: string, query: string) {
         wx.shareAppMessage({
             title: title,
-            imageUrlId: imageUrl,
+            imageUrlId: imageUrlId,
+            imageUrl: imageUrl,
             query: query,
         });
     }
@@ -113,8 +113,8 @@ export default class WXPlatform implements IPlatform {
         });
     }
 
-    showModal(title:string, callback: (isConfirm: boolean) => any, content:string="", showCancel:any = true, confirmText: any="确定",
-    cancelText: any="取消") {
+    showModal(title: string, callback: (isConfirm: boolean) => any, content: string = "", showCancel: any = true, confirmText: any = "确定",
+        cancelText: any = "取消") {
         wx.showModal({
             title: title,
             content: content,

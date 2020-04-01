@@ -1,6 +1,6 @@
 {
   "ver": "2.3.4",
-  "uuid": "cd6fff07-9003-47a0-82a5-d65f5ba89618",
+  "uuid": "49e0548d-e4f1-43e5-baea-d96136c4daab",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
@@ -13,8 +13,8 @@
   "subMetas": {
     "team_button": {
       "ver": "1.0.4",
-      "uuid": "d3ef17fc-d5ae-40a9-b517-dc38b5027f47",
-      "rawTextureUuid": "cd6fff07-9003-47a0-82a5-d65f5ba89618",
+      "uuid": "101b3268-a96b-468c-acb0-0581dfc65bf0",
+      "rawTextureUuid": "49e0548d-e4f1-43e5-baea-d96136c4daab",
       "trimType": "auto",
       "trimThreshold": 1,
       "rotated": false,

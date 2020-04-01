@@ -1,4 +1,4 @@
-import { GameType, RoomStatus, RoomStartAction } from "../../Constants";
+import { GameType, RoomStatus } from "../../Constants";
 import { GameVO, PlayerVO } from "./GameVO";
 
 export class RoomVO {
@@ -11,8 +11,6 @@ export class RoomVO {
     status: RoomStatus;
 
     playersInfo: Array<PlayerVO> = [];
-
-    startAction: RoomStartAction;
 
     public constructor() {
     }

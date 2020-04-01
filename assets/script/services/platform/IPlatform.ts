@@ -3,9 +3,10 @@ import DevPlatform from "./DevPlatform";
 
 export interface IPlatform {
     getOpenID(): Promise<any>;
-    authorize(): Promise<any>;
+    authSettingOfUserInfo(): Promise<any>;
+    createUserInfoButton();
     getUserInfo(): Promise<any>;
-    shareAppMessage(title: string, imageUrl: string, query: string): Promise<any>;
+    shareAppMessage(title: string, imageUrl: string, imageUrlId: string, query: string): Promise<any>;
     getLaunchOption(): Promise<any>;
     getLaunchOptionOnShow(callback: (query: any, scene: any) => any);
     showLoading(title?: string, isMask?: boolean);

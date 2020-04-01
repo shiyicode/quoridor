@@ -37,15 +37,30 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
     public async initialization() {
         const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
 
+        await UIManager.getInstance().showLoadingSync(false);
+
         // 获取 用户唯一标识
         let openId = await Platform().getOpenID();
+        if(openId == "") {
+            Platform().showModal("提示", (isConfirm) => {
+                if(isConfirm) {
+                    this.initialization();
+                }
+            }, "游戏初始化失败，确认重试?", false, "确认");
+            return;
+        }
         userProxy.setOpenId(openId);
 
-        // 鉴权
-        await Platform().authorize();
 
-        // 展示loading
-        await UIManager.getInstance().showLoadingSync(false);
+        let isAuthorize = await Platform().authSettingOfUserInfo();
+        if (isAuthorize) {
+            console.log('authorize already');
+        } else {
+            console.log("authorize wait");
+            UIManager.getInstance().hideLoading();
+            await Platform().createUserInfoButton();
+            await UIManager.getInstance().showLoadingSync(false);
+        }
 
         // 获取用户信息
         if (!userProxy.getUserInfo().avatarUrl) {
@@ -72,7 +87,7 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
                         if(isConfirm) {
                             this.initialization();
                         }
-                    }, "初始化失败，点击重试", false, "确认");
+                    }, "游戏启动失败，确认重试?", false, "确认");
                 }
             });
     }
@@ -94,7 +109,7 @@ export default class WelcomeViewMediator extends puremvc.Mediator implements pur
         Platform().getLaunchOptionOnShow((query:any, scene:any) => {
             console.log("再次进入界面OnShow", query, scene);
             userProxy.setLaunch({query: query, scene: scene});
-            this.facade.sendNotification(RoomNotification.ROOM_RETURN_NOT_CHECK);
+            this.facade.sendNotification(WorldNotification.RUN_LAUNCH);
         });
     }
 }

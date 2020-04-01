@@ -2,34 +2,47 @@ import AppFacade from "../../AppFacade";
 import RoomViewMediator from "../RoomViewMediator";
 import { RoomVO } from "../../model/vo/RoomVO";
 import Util from "../../util/Util";
-import { GameType, RoomStatus } from "../../Constants";
+import { GameType, RoomStatus, ProjectConfig } from "../../Constants";
 import { Platform } from "../../services/platform/IPlatform";
+import { BaseUI } from "./BaseUI";
+import { Player } from "./Player";
 
 const { ccclass, property } = cc._decorator;
 
+
 @ccclass
-export default class RoomView extends cc.Component {
+export default class RoomView extends BaseUI {
+
+    public static NAME = "RoomView";
+
+    static getUrl(): string {
+        return ProjectConfig.PREFAB_UI_DIR + RoomView.NAME;
+    }
 
     @property(cc.Node)
-    playersNode: cc.Node = null;
-
+    leaveButton: cc.Node = null;
     @property(cc.Node)
-    teamBarNode: cc.Node = null;
-
+    helpButton: cc.Node = null;
+    @property(cc.Node)
+    matchCancelButton: cc.Node = null;
+    @property(cc.Node)
+    matchBeginButton: cc.Node = null;
     @property(cc.Node)
     matchBarNode: cc.Node = null;
-
-    @property(cc.Button)
-    readyButton: cc.Button = null;
-
-    @property(cc.Button)
-    cancelButton: cc.Button = null;
-
-    @property(cc.Button)
-    matchReadyButton: cc.Button = null;
-
-    @property(cc.Button)
-    matchCancelButton: cc.Button = null;
+    @property(cc.Node)
+    player0Node: cc.Node = null;
+    @property(cc.Node)
+    player1Node: cc.Node = null;
+    @property(cc.Node)
+    player2Node: cc.Node = null;
+    @property(cc.Node)
+    player3Node: cc.Node = null;
+    @property(cc.Node)
+    teamInviteButton: cc.Node = null;
+    @property(cc.Node)
+    teamReadyButton: cc.Node = null;
+    @property(cc.Node)
+    teamUnreadyButton: cc.Node = null;
 
     start() {
         AppFacade.getInstance().registerMediator(new RoomViewMediator(this));
@@ -39,114 +52,57 @@ export default class RoomView extends cc.Component {
         AppFacade.getInstance().removeMediator(RoomViewMediator.NAME);
     }
 
-    update(dt) {
-
-    }
-
     updateRoom(room: RoomVO) {
-        console.log("更新房间界面");
-
-        this.setBar(room);
+        console.log("更新房间界面", room);
 
         let playerNodeArray: Array<cc.Node> = [];
         let playerCnt = Util.getPlayerCntByType(room.gameType);
         if (playerCnt == 2) {
-            playerNodeArray.push(this.playersNode.getChildByName("player0"));
-            playerNodeArray.push(this.playersNode.getChildByName("player2"));
-            this.playersNode.getChildByName("player1").active = false;
-            this.playersNode.getChildByName("player3").active = false;
+            playerNodeArray.push(this.player0Node);
+            playerNodeArray.push(this.player2Node);
+            this.player1Node.active = false;
+            this.player3Node.active = false;
         } else {
-            for (let i = 0; i < 4; i++) {
-                let node = this.playersNode.getChildByName('player' + i.toString());
-                playerNodeArray.push(node);
+            playerNodeArray.push(this.player0Node);
+            playerNodeArray.push(this.player1Node);
+            playerNodeArray.push(this.player2Node);
+            playerNodeArray.push(this.player3Node);
+        }
+
+        if (room.gameType == GameType.MATCH2 || room.gameType == GameType.MATCH4) {
+            if (room.status == RoomStatus.MATCH_WILL) {
+                this.matchBarNode.active = false;
+                this.matchBeginButton.active = true;
+            } else if (room.status == RoomStatus.MATCH_ING) {
+                this.matchBarNode.active = true;
+                this.matchBeginButton.active = false;
+            } else if (room.status == RoomStatus.MATCH_SUCC) {
+                this.matchBarNode.active = false;
+                this.matchBeginButton.active = false;
             }
+        } else if (room.gameType == GameType.TEAM2 || room.gameType == GameType.TEAM4) {
+            this.teamReadyButton.active = !room.playersInfo[0].isReady;
+            this.teamUnreadyButton.active = room.playersInfo[0].isReady;
+            this.teamInviteButton.active = true;
         }
 
         for (let i = 0; i < playerCnt; i++) {
-            if (room.playersInfo[i] && room.playersInfo[i].playerID && room.playersInfo[i].playerID != "") {
-                let isReady = room.playersInfo[i].isReady;
-                if(room.gameType == GameType.MATCH2 || room.gameType == GameType.MATCH4) {
-                    isReady = false;
+            let player = playerNodeArray[i].getComponent(Player);
+
+            if (room.playersInfo[i]) {
+                let isReady = false;
+                if (room.gameType == GameType.TEAM2 || room.gameType == GameType.TEAM4) {
+                    isReady = room.playersInfo[i].isReady;
                 }
-                this.setPlayerInfo(playerNodeArray[i], room.playersInfo[i].avatarUrl,
-                    room.playersInfo[i].nickName, isReady);
-            }
-        }
-        if (room.playersInfo[0].isReady != undefined) {
-            this.readyButton.node.active = !room.playersInfo[0].isReady;
-            this.cancelButton.node.active = room.playersInfo[0].isReady;
-        }
-    }
-
-    public setBar(room: RoomVO) {
-        if (room.gameType == GameType.TEAM2 || room.gameType == GameType.TEAM4) {
-            this.teamBarNode.active = true;
-            this.matchBarNode.active = false;
-
-        } else if (room.gameType == GameType.MATCH2 || room.gameType == GameType.MATCH4) {
-            this.teamBarNode.active = false;
-            this.matchBarNode.active = true;
-
-            let ready_title = this.matchBarNode.getChildByName("ready_title");
-            let cancel_title = this.matchBarNode.getChildByName("matching");
-            if (room.status == RoomStatus.START) {
-                this.matchCancelButton.node.active = true;
-                cancel_title.active = true;
-                this.matchReadyButton.node.active = false;
-                ready_title.active = false;
-            } else if (room.status == RoomStatus.WAIT) {
-                this.matchCancelButton.node.active = false;
-                cancel_title.active = false;
-                this.matchReadyButton.node.active = true;
-                ready_title.active = true;
-
+                player.setPlayer(room.playersInfo[i].nickName, room.playersInfo[i].avatarUrl);
+                player.setWait(false);
+                player.setReady(isReady);
+            } else {
+                player.setPlayer("", "");
+                player.setWait(true);
+                player.setReady(false);
             }
         }
     }
 
-    public setPlayerInfo(playerNode: cc.Node, avatarUrl: string, nickName: string, isReady: boolean) {
-        let head = playerNode.getChildByName('mask').getChildByName('head')
-        let headBG = head.getComponent(cc.Sprite);
-
-        let name = playerNode.getChildByName('name').getComponent(cc.Label);
-
-        if (avatarUrl) {
-            cc.loader.load({
-                url: avatarUrl,
-                type: 'jpg'
-            }, function (err, texture) {
-                if (err == null) {
-                    headBG.spriteFrame = new cc.SpriteFrame(texture);
-                }
-                head.active = true;
-            });
-        } else {
-            head.active = false;
-        }
-
-        if (nickName) {
-            nickName = Util.cutstr(nickName, 5);
-            name.string = nickName;
-        } else {
-            name.string = "";
-        }
-
-        playerNode.getChildByName('ready_tag').active = isReady;
-    }
-
-    matchReadyButtonClick(event, data) { }
-
-    matchCancelButtonClick(event, data) { }
-
-    readyButtonClick(event, data) { }
-
-    cancelButtonClick(event, data) { }
-
-    inviteButtonClick(event, data) { }
-
-    leaveButtonClick(event, data) { }
-
-    chatButtonClick(event, data) {
-        Platform().showToast("聊天功能尚未开放，敬请期待！");
-    }
 }

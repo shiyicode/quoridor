@@ -2,7 +2,8 @@
   "excludeScenes": [
     "2218c349-c191-44d6-8e54-23d4de247179",
     "1061ee5a-480f-467e-8115-a63d794add55",
-    "fbd0ce36-3bda-4e04-822e-60d4e4d03b5d"
+    "fbd0ce36-3bda-4e04-822e-60d4e4d03b5d",
+    "7d9a64f0-1487-4315-b6d9-6578eb7882ea"
   ],
   "orientation": {
     "landscapeLeft": true,
@@ -19,7 +20,7 @@
   "inlineSpriteFrames_native": true,
   "mergeStartScene": true,
   "optimizeHotUpdate": false,
-  "md5Cache": false,
+  "md5Cache": true,
   "encryptJs": true,
   "xxteaKey": "0ea81736-b80f-4c",
   "zipCompressJs": true,

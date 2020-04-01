@@ -1,8 +1,15 @@
-import { RoomNotification, GameType, Scene, WorldNotification, RoomStartAction } from "../Constants";
+import { GameType, WorldNotification, RoomStatus } from "../Constants";
 import UserProxy from "../model/UserProxy";
 import MenuView from "../view/component/MenuView";
 import RoomProxy from "../model/RoomProxy";
-import { Platform } from "../services/platform/IPlatform";
+import { Player } from "./component/Player";
+import { UIManager } from "../manager/UIManager";
+import { HelpView } from "./component/HelpView";
+import RoomView from "./component/RoomView";
+import MgobeService from "../services/mgobe/MgobeService";
+import Util from "../util/Util";
+import { AudioManager } from "../manager/AudioManager";
+import GameView from "./component/GameView";
 
 
 export default class MenuViewMediator extends puremvc.Mediator implements puremvc.IMediator {
@@ -14,52 +21,15 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
 
     public listNotificationInterests(): string[] {
         return [
-            RoomNotification.ROOM_CREATE,
-            RoomNotification.ROOM_JOIN,
-            RoomNotification.ROOM_MATCH,
-            RoomNotification.ROOM_RETURN_CHECK,
-            RoomNotification.ROOM_RETURN_NOT_CHECK,
-            WorldNotification.SHOW_TIPS,
+            WorldNotification.RUN_LAUNCH,
         ];
     }
 
     public handleNotification(notification: puremvc.INotification): void {
-        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
         const data = notification.getBody();
         switch (notification.getName()) {
-            case RoomNotification.ROOM_CREATE:
-                Platform().hideLoading();
-                cc.director.loadScene(Scene.ROOM);
-                break;
-            case RoomNotification.ROOM_JOIN:
-                Platform().hideLoading();
-                cc.director.loadScene(Scene.ROOM);
-                break;
-            case RoomNotification.ROOM_MATCH:
-                Platform().hideLoading();
-                cc.director.loadScene(Scene.ROOM);
-                break;
-            case RoomNotification.ROOM_RETURN_CHECK: {
-                Platform().hideLoading();
-                Platform().showModal("提示", (isConfirm) => {
-                    if(isConfirm) {
-                        console.log("进入已进行中的游戏");
-                        // cc.director.loadScene(Scene.GAME);
-                    } else {
-                        console.log("忽略已进行中的游戏");
-                        roomProxy.leaveRoom();
-                    }
-                }, "检测到您有对局尚未结束，是否跳转？", true, "确认", "取消");
-                break;
-            }
-            case RoomNotification.ROOM_RETURN_NOT_CHECK: {
-                Platform().hideLoading();
+            case WorldNotification.RUN_LAUNCH: {
                 this.actionByLaunchQuery();
-                break;
-            }
-            case WorldNotification.SHOW_TIPS: {
-                Platform().hideLoading();
-                Platform().showToast(data.title);
                 break;
             }
         }
@@ -69,13 +39,26 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
         this.initView();
         this.initCallback();
 
-        // const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
-        // roomProxy.returnRoom();
-        // // TODO
-        // Platform().showLoading();
+        this.actionByLaunchQuery();
     }
 
     public onRemove(): void {
+    }
+
+
+    public initView() {
+        const viewComponent = this.viewComponent as MenuView;
+        const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
+
+        // viewComponent.setModeType(userProxy.getModeType());
+        let userInfo = userProxy.getUserInfo();
+
+        let player = viewComponent.playerNode.getComponent(Player);
+        player.setPlayer(userInfo.nickName, userInfo.avatarUrl);
+    }
+
+    public playerGame() {
+
     }
 
     public initCallback() {
@@ -83,107 +66,177 @@ export default class MenuViewMediator extends puremvc.Mediator implements puremv
         const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
         const viewComponent = this.viewComponent as MenuView;
 
-        // 设置控件回调
-        viewComponent.mode2ButtonClick = (event, data) => {
+        viewComponent.matchButton.on("click", () => {
+            console.log("match button click");
+            AudioManager.getInstance().playSound("touch");
+            let gameType = ("match" + userProxy.getModeType().toString()) as GameType;
+            UIManager.getInstance().openUISync(RoomView, 0, () => {
+                roomProxy.initRoom(gameType);
+                UIManager.getInstance().hideUI(MenuView);
+            });
+        });
+
+        viewComponent.teamButton.on("click", () => {
+            console.log("team button click");
+            AudioManager.getInstance().playSound("touch");
+
+            let gameType = ("team" + userProxy.getModeType().toString()) as GameType;
+            this.createRoom(gameType);
+        });
+
+        viewComponent.machineButton.on("click", () => {
+            console.log("machine button click");
+            AudioManager.getInstance().playSound("touch");
+
+            UIManager.getInstance().showTip("暂未开放，敬请期待!");
+        });
+
+        viewComponent.helpButton.on("click", () => {
+            console.log("help button click");
+            AudioManager.getInstance().playSound("touch");
+
+            UIManager.getInstance().openUISync(HelpView, 0, () => {
+            });
+        });
+
+        viewComponent.rankButton.on("click", () => {
+            console.log("rank button click");
+            AudioManager.getInstance().playSound("touch");
+
+            UIManager.getInstance().showTip("暂未开放，敬请期待!");
+        });
+
+        viewComponent.mode2Button.on("click", () => {
             console.log("mode2 button click");
+            AudioManager.getInstance().playSound("touch");
+            UIManager.getInstance().showTip("暂未开放，敬请期待!");
 
-            viewComponent.setModeType(4);
-            userProxy.setModeType(4);
-        };
+            // userProxy.setModeType(4);
+            // viewComponent.setModeType(4);
+        });
 
-        viewComponent.mode4ButtonClick = (event, data) => {
+        viewComponent.mode4Button.on("click", () => {
             console.log("mode4 button click");
+            AudioManager.getInstance().playSound("touch");
 
             viewComponent.setModeType(2);
             userProxy.setModeType(2);
-        };
-
-        viewComponent.team2ButtonClick = (event, data) => {
-            console.log("team2 button click");
-            roomProxy.createRoom(GameType.TEAM2);
-            Platform().showLoading();
-        };
-
-        viewComponent.team4ButtonClick = (event, data) => {
-            console.log("team4 button click");
-            roomProxy.createRoom(GameType.TEAM4);
-            Platform().showLoading();
-        };
-
-        viewComponent.match2ButtonClick = (event, data) => {
-            console.log("match2 button click");
-            roomProxy.initRoom(GameType.MATCH2, RoomStartAction.MATCH);
-            cc.director.loadScene(Scene.ROOM);
-        };
-
-        viewComponent.match4ButtonClick = (event, data) => {
-            console.log("match4 button click");
-            roomProxy.initRoom(GameType.MATCH4, RoomStartAction.MATCH);
-            cc.director.loadScene(Scene.ROOM);
-            // this.facade.sendNotification(RoomNotification.ROOM_CREATE, { gameType: GameType.MATCH2 });
-        };
-
-        viewComponent.machine2ButtonClick = (event, data) => {
-            console.log("machine2 button click");
-            Platform().showToast("敬请期待！");
-        };
-
-        viewComponent.machine4ButtonClick = (event, data) => {
-            console.log("machine4 button click");
-            Platform().showToast("敬请期待！");
-        };
-
-        viewComponent.shareButtonClick = () => {
-            Platform().shareAppMessage(
-                "墙棋，欧美最风行的棋类游戏，一起来玩吧！",
-                "Eg-pgRbJSpyh-uGwnzdeZQ",
-                "",
-            );
-        }
-
-        viewComponent.helpButtonClick = () => {
-            viewComponent.helpNode.active = true;
-        }
+        });
     }
 
-    public initView() {
-        const viewComponent = this.viewComponent as MenuView;
-        const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
+    public createRoom(gameType: GameType) {
+        UIManager.getInstance().showLoadingSync(true);
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+        console.log("创建组队房间");
 
-        viewComponent.setModeType(userProxy.getModeType());
+        roomProxy.initRoom(gameType);
+        let room = roomProxy.getRoom();
 
-        let userInfo = userProxy.getUserInfo();
-        viewComponent.setUserInfo(userInfo.avatarUrl, userInfo.nickName);
+        MgobeService.createRoom(room.playersInfo[0], Util.getPlayerCntByType(gameType), gameType, (event) => {
+
+            if (event.code === MGOBE.ErrCode.EC_OK) {
+                console.log("创建房间成功", event);
+                roomProxy.setRoom(event.data.roomInfo);
+                UIManager.getInstance().openUISync(RoomView, 0, () => {
+                    UIManager.getInstance().hideLoading();
+                    UIManager.getInstance().hideUI(MenuView);
+                });
+            } else {
+                if (event.code == MGOBE.ErrCode.EC_ROOM_PLAYER_ALREADY_IN_ROOM) {
+                    MgobeService.leaveRoom((event) => {
+                        if (event.code === MGOBE.ErrCode.EC_OK || event.code === MGOBE.ErrCode.EC_ROOM_PLAYER_NOT_IN_ROOM) {
+                            console.log("离开房间成功", event);
+                            this.createRoom(gameType);
+                        } else {
+                            console.log("离开房间失败", event);
+                            UIManager.getInstance().hideLoading();
+                            UIManager.getInstance().showTip("创建房间失败，请重试");
+                        }
+                    });
+                } else {
+                    console.log("创建房间失败", event);
+                    UIManager.getInstance().hideLoading();
+                    UIManager.getInstance().showTip("创建房间失败，请重试");
+                }
+            }
+        });
+    }
+
+
+    public joinRoom(gameType: GameType, roomId: string) {
+        UIManager.getInstance().showLoadingSync(true);
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+        console.log("加入组队房间");
+
+        roomProxy.initRoom(gameType);
+        let room = roomProxy.getRoom();
+
+        MgobeService.joinRoom(roomId, room.playersInfo[0], (event) => {
+            if (event.code === MGOBE.ErrCode.EC_OK) {
+                console.log("加入房间成功", event);
+                roomProxy.setRoom(event.data.roomInfo);
+                UIManager.getInstance().openUISync(RoomView, 0, () => {
+                    UIManager.getInstance().hideLoading();
+                    UIManager.getInstance().hideUI(MenuView);
+                });
+            } else if (event.code == MGOBE.ErrCode.EC_ROOM_PLAYER_ALREADY_IN_ROOM) {
+                MgobeService.leaveRoom((event) => {
+                    if (event.code === MGOBE.ErrCode.EC_OK || event.code === MGOBE.ErrCode.EC_ROOM_PLAYER_NOT_IN_ROOM) {
+                        console.log("离开房间成功", event);
+                        this.joinRoom(gameType, roomId);
+                    } else {
+                        console.log("离开房间失败", event);
+                        UIManager.getInstance().hideLoading();
+                        UIManager.getInstance().showTip("加入房间失败，请重试");
+                    }
+                });
+            } else if (event.code == MGOBE.ErrCode.EC_ROOM_INFO_UNEXIST) {
+                console.log("房间不存在", event);
+                UIManager.getInstance().hideLoading();
+                UIManager.getInstance().showTip("加入房间失败，房间不存在");
+            } else {
+                console.log("加入房间失败", event);
+                UIManager.getInstance().hideLoading();
+                UIManager.getInstance().showTip("加入房间失败，请重试");
+            }
+        });
     }
 
     actionByLaunchQuery() {
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
         const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
 
         let launch = userProxy.getLaunch();
+        // 重置launch
         userProxy.setLaunch({});
+
+        console.log("重置launch", userProxy.getLaunch());
 
         console.log("执行获取参数", launch);
         if ((launch && launch.query && launch.scene) && (launch.scene == 1007 || launch.scene == 1008)) {
-            switch (launch.query.type as GameType) {
-                case GameType.TEAM2: {
-                    const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
-                    Platform().showLoading();
-                    console.log("加入房间", launch.query);
-                    roomProxy.initRoom(GameType.TEAM2, RoomStartAction.DEFAULT);
-                    roomProxy.joinRoom(launch.query.roomId);
-                    break;
+            if (launch.query.type) {
+                let room = roomProxy.getRoom();
+                if (room && room.status) {
+                    if (room.status == RoomStatus.GAME_ING
+                        || room.status == RoomStatus.MATCH_ING
+                        || room.status == RoomStatus.MATCH_SUCC) {
+                        console.log("忽略执行获取参数", room.status);
+                        return;
+                    } else if (room.status == RoomStatus.GAME_END) {
+                        UIManager.getInstance().closeUI(GameView);
+                        UIManager.getInstance().showUI(MenuView);
+                    } else if (room.status == RoomStatus.TEAM) {
+                        UIManager.getInstance().closeUI(RoomView);
+                        UIManager.getInstance().showUI(MenuView);
+                    } else if(room.status == RoomStatus.MATCH_WILL) {
+                        UIManager.getInstance().closeUI(RoomView);
+                        UIManager.getInstance().showUI(MenuView);
+                    }
                 }
-                case GameType.TEAM4: {
-                    const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
-                    Platform().showLoading();
-                    console.log("加入房间", launch.query);
-                    roomProxy.initRoom(GameType.TEAM4, RoomStartAction.DEFAULT);
-                    roomProxy.joinRoom(launch.query.roomId);
-                    break;
-                }
-                default: {
 
-                }
+                let gameType = launch.query.type as GameType;
+                console.log("加入房间", launch.query);
+                this.joinRoom(gameType, launch.query.roomId);
             }
         }
     }

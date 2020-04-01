@@ -1,26 +1,27 @@
-import { RoomNotification, Scene, WorldNotification, RoomStatus, GameType, RoomStartAction } from "../Constants";
+import { RoomNotification, Scene, RoomStatus, GameType } from "../Constants";
 import RoomView from "../view/component/RoomView";
 import RoomProxy from "../model/RoomProxy";
 import { Platform } from "../services/platform/IPlatform";
 import MgobeService from "../services/mgobe/MgobeService";
 import Util from "../util/Util";
 import GameProxy from "../model/GameProxy";
-import UserProxy from "../model/UserProxy";
+import { UIManager } from "../manager/UIManager";
+import { HelpView } from "./component/HelpView";
+import MenuView from "./component/MenuView";
+import GameView from "./component/GameView";
+import { AudioManager } from "../manager/AudioManager";
 
 export default class RoomViewMediator extends puremvc.Mediator implements puremvc.IMediator {
     public static NAME: string = "RoomViewMediator";
-    public isJumpGame;
 
     public constructor(viewComponent: any) {
         super(RoomViewMediator.NAME, viewComponent);
-        this.isJumpGame = false;
     }
 
     public listNotificationInterests(): string[] {
         return [
             RoomNotification.ROOM_UPDATE,
             RoomNotification.ROOM_LEAVE,
-            WorldNotification.SHOW_TIPS,
         ];
     }
 
@@ -39,11 +40,6 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
                 cc.director.loadScene(Scene.MENU);
                 break;
             }
-            case WorldNotification.SHOW_TIPS: {
-                Platform().hideLoading();
-                Platform().showToast(data.title);
-                break;
-            }
         }
     }
 
@@ -51,9 +47,17 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
         this.initView();
         this.initCallback();
 
-        this.listenRoom();
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+        let room = roomProxy.getRoom();
+        console.log("onRego", room);
 
-        this.runStartAction();
+        if (room.gameType == GameType.MATCH2 || room.gameType == GameType.MATCH4) {
+            if (room.status == RoomStatus.MATCH_ING) {
+                this.matchPlayers();
+            }
+        } else if (room.gameType == GameType.TEAM2 || room.gameType == GameType.TEAM4) {
+            this.listenRoom();
+        }
     }
 
     public onRemove(): void {
@@ -64,65 +68,180 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
         const viewComponent = this.viewComponent as RoomView;
         const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
 
+        var anim = viewComponent.getComponent(cc.Animation);
+        var animState = anim.play("match");
+
         // 获取房间信息，初始化界面
         let room = roomProxy.getRoom();
         viewComponent.updateRoom(room);
-        console.log("初始化房间界面", room);
-    }
-
-    public runStartAction() {
-        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
-
-        // 获取房间信息，初始化界面
-        let room = roomProxy.getRoom();
-        switch (room.startAction) {
-            case RoomStartAction.MATCH: {
-                roomProxy.matchPlayers();
-            }
-        }
-
-        roomProxy.setRoomStartAction(RoomStartAction.DEFAULT);
     }
 
     public initCallback() {
         const viewComponent = this.viewComponent as RoomView;
         const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
 
-        viewComponent.readyButtonClick = (event, data) => {
-            console.log("ready button click");
-            roomProxy.setReadyStatus(true);
-        };
-        viewComponent.cancelButtonClick = (event, data) => {
-            console.log("cancel button click");
-            roomProxy.setReadyStatus(false);
-        };
-        viewComponent.matchReadyButtonClick = (event, data) => {
-            console.log("match ready button click");
-            roomProxy.setRoomStatus(RoomStatus.START);
-            roomProxy.matchPlayers();
-        };
-        viewComponent.matchCancelButtonClick = (event, data) => {
-            console.log("match cancel button click");
-            roomProxy.cancelMatch();
-        };
-        viewComponent.leaveButtonClick = (event, data) => {
+        viewComponent.leaveButton.on("click", () => {
             console.log("leave button click");
-            let room = roomProxy.getRoom();
-            if (room.gameType == GameType.MATCH2 || room.gameType == GameType.MATCH4) {
-                roomProxy.cancelMatch();
+            AudioManager.getInstance().playSound("touch");
+
+            if(roomProxy.getRoom().status == RoomStatus.MATCH_ING) {
+                this.cancelMatch();
             }
-            roomProxy.leaveRoom();
-        };
-        viewComponent.inviteButtonClick = (event, data) => {
+            this.leaveRoom();
+            roomProxy.setRoomStatus(RoomStatus.DEFAULT);
+            UIManager.getInstance().showUI(MenuView);
+            UIManager.getInstance().closeUI(RoomView);
+        });
+
+        viewComponent.helpButton.on("click", () => {
+            console.log("help button click");
+            AudioManager.getInstance().playSound("touch");
+
+            UIManager.getInstance().openUISync(HelpView, 0, () => {
+            });
+        });
+
+        viewComponent.matchCancelButton.on("click", () => {
+            console.log("match cancel button click");
+            AudioManager.getInstance().playSound("touch");
+
+            this.cancelMatch();
+        });
+
+        viewComponent.matchBeginButton.on("click", () => {
+            console.log("match begin button click");
+            AudioManager.getInstance().playSound("touch");
+
+            this.matchPlayers();
+        });
+
+        viewComponent.teamReadyButton.on("click", () => {
+            console.log("ready button click");
+            AudioManager.getInstance().playSound("touch");
+
+            MgobeService.changeCustomPlayerStatus(1, (event) => {
+                if (event.code === MGOBE.ErrCode.EC_OK) {
+                } else {
+                    UIManager.getInstance().showTip("操作失败，请重试");
+                }
+            });
+        });
+
+        viewComponent.teamUnreadyButton.on("click", () => {
+            console.log("unready button click");
+            AudioManager.getInstance().playSound("touch");
+
+            MgobeService.changeCustomPlayerStatus(0, (event) => {
+                if (event.code === MGOBE.ErrCode.EC_OK) {
+                } else {
+                    UIManager.getInstance().showTip("操作失败，请重试");
+                }
+            });
+        });
+
+        viewComponent.teamInviteButton.on("click", () => {
             console.log("invite button click");
+            AudioManager.getInstance().playSound("touch");
+
             let room = roomProxy.getRoom();
             console.log("好友组队邀请", "type=" + room.gameType + "&roomId=" + room.roomId);
             Platform().shareAppMessage(
                 "房已开好，就差你了！",
+                "https://mmocgame.qpic.cn/wechatgame/iaj0rRlwQUrJtbiaxIaZNhApCqNmKHeJHe06GuLX9qyTqRI9icaUiciaM3wyStPRIvn3v/0",
                 "Eg-pgRbJSpyh-uGwnzdeZQ",
                 "type=" + room.gameType + "&roomId=" + room.roomId,
             );
+        });
+    }
+
+    public matchPlayers() {
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+        roomProxy.setRoomStatus(RoomStatus.MATCH_ING);
+        let room = roomProxy.getRoom();
+
+        let callback = (event) => {
+            if (event.code === MGOBE.ErrCode.EC_OK) {
+                console.log("发起匹配成功", event);
+                MgobeService.changeCustomPlayerStatus(1, (event) => {
+                    if (event.code === MGOBE.ErrCode.EC_OK) {
+                        roomProxy.setRoomStatus(RoomStatus.MATCH_SUCC);
+                        roomProxy.setRoom(event.data.roomInfo);
+                    } else {
+                        UIManager.getInstance().showTip("匹配失败，请重试");
+                    }
+                });
+                this.listenRoom();
+            } else if (event.code == MGOBE.ErrCode.EC_MATCH_TIMEOUT) {
+                console.log("匹配超时", event);
+                roomProxy.setRoomStatus(RoomStatus.MATCH_WILL);
+                UIManager.getInstance().showTip("匹配超时，请重试");
+            } else if (event.code == MGOBE.ErrCode.EC_MATCH_PLAYER_IS_IN_MATCH) {
+                console.log("已在匹配中", event);
+                MgobeService.cancelMatch((event) => {
+                    if (event.code === MGOBE.ErrCode.EC_OK) {
+                        console.log("取消匹配成功", event);
+                        this.matchPlayers();
+                    } else {
+                        console.log("取消匹配失败", event);
+                        roomProxy.setRoomStatus(RoomStatus.MATCH_WILL);
+                        UIManager.getInstance().showTip("匹配失败，请重试");
+                    }
+                });
+                roomProxy.setRoomStatus(RoomStatus.MATCH_ING);
+            } else if (event.code == MGOBE.ErrCode.EC_ROOM_PLAYER_ALREADY_IN_ROOM) {
+                console.log("已在房间中，离开房间并重试", event);
+                MgobeService.leaveRoom((event) => {
+                    if (event.code === MGOBE.ErrCode.EC_OK || event.code === MGOBE.ErrCode.EC_ROOM_PLAYER_NOT_IN_ROOM) {
+                        console.log("离开房间成功", event);
+                        roomProxy.initRoom(room.gameType);
+                        MgobeService.matchPlayers(room.playersInfo[0], Util.getPlayerCntByType(room.gameType),
+                            room.gameType, callback);
+                    } else {
+                        console.log("离开房间失败", event);
+                        roomProxy.setRoomStatus(RoomStatus.MATCH_WILL);
+                        UIManager.getInstance().showTip("匹配失败，请重试");
+                    }
+                });
+            } else {
+                console.log("发起匹配失败", event);
+                roomProxy.setRoomStatus(RoomStatus.MATCH_WILL);
+                UIManager.getInstance().showTip("匹配失败，请重试");
+            }
         };
+        console.log("发起匹配", room);
+        MgobeService.matchPlayers(room.playersInfo[0], Util.getPlayerCntByType(room.gameType),
+            room.gameType, callback);
+    }
+
+    public cancelMatch() {
+        console.log("取消匹配");
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+
+        MgobeService.cancelMatch((event) => {
+            if (event.code === MGOBE.ErrCode.EC_OK) {
+                console.log("取消匹配成功", event);
+                roomProxy.setRoomStatus(RoomStatus.MATCH_WILL);
+            } else {
+                console.log("取消匹配失败", event);
+                UIManager.getInstance().showTip("取消匹配失败，请重试");
+            }
+        });
+    }
+
+    public leaveRoom() {
+        MgobeService.getMyRoom((event) => {
+            if (event.code === MGOBE.ErrCode.EC_OK) {
+                MgobeService.leaveRoom((event) => {
+                    if (event.code === MGOBE.ErrCode.EC_OK || event.code === MGOBE.ErrCode.EC_ROOM_PLAYER_NOT_IN_ROOM) {
+                        console.log("离开房间成功", event);
+                    } else {
+                        console.log("离开房间失败", event);
+                    }
+                });
+            } else {
+                console.log("获取房间信息失败", event);
+            }
+        });
     }
 
     public listenRoom() {
@@ -135,52 +254,17 @@ export default class RoomViewMediator extends puremvc.Mediator implements puremv
         MgobeService.room.onUpdate = (event) => {
             console.log("事件回调onUpdate", event.roomInfo);
             roomProxy.setRoom(event.roomInfo);
-
             let room = roomProxy.getRoom();
 
-            if (!this.isJumpGame) {
-                // 房间已经完成准备
-                if (MgobeService.isStartFrameSync()) {
-                    console.log("游戏已在进行中，前往Game场景");
-                    cc.director.loadScene(Scene.GAME);
-                } else if (roomProxy.isRoomReady()) {
-                    gameProxy.createGame(room);
-                    console.log("全部玩家已准备，前往Game场景");
-                    cc.director.loadScene(Scene.GAME);
-                }
-                this.isJumpGame = true;
+            if (roomProxy.isRoomReady()) {
+                gameProxy.createGame(room);
+                console.log("全部玩家已准备，前往Game场景");
+                UIManager.getInstance().openUISync(GameView, 0, () => {
+                    UIManager.getInstance().closeUI(RoomView);
+                });
             }
-            // switch (event.roomInfo.customProperties as RoomStatus) {
-            //     case RoomStatus.WAIT: {
-            // const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
-            // let playerID = userProxy.getPlayerId();
-            // 如果是房主
-            // if (event.roomInfo.owner == playerID) {
-            //     // 如果所有玩家都准备好了
-            //     if (event.roomInfo.playerList[0].customPlayerStatus == 1) {
-            //         MgobeService.changeRoomStatus(RoomStatus.START);
-            //         // this.startRoom();
-            //     }
-            // }
-            // case RoomStatus.START: {
-            // }
         }
 
-        // if (!event.roomInfo.playerList.find(player => player.customPlayerStatus !== 1)) {
-        // }
-
-        // const userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
-        // let playerID = userProxy.getPlayerId();
-        // // 如果是房主
-        // if (event.roomInfo.owner == playerID) {
-        //     // 如果所有玩家都准备好了
-        //     if (event.roomInfo.playerList[0].customPlayerStatus == 1) {
-        //         MgobeService.changeRoomStatus(RoomStatus.START);
-        //         this.startRoom();
-        //     } else {
-        //         MgobeService.changeRoomStatus(RoomStatus.WAIT);
-        //     }
-        // }
 
         MgobeService.room.onJoinRoom = (event) => {
 

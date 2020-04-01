@@ -33,12 +33,13 @@ export class TipView extends BaseUI {
         let tip = TipNode.getComponent(Tip);
         this.tipPool.push(tip);
 
-        let sleep = cc.delayTime(0.5);
-        let callback = cc.callFunc(() => {
-            tip.playTip(message);
-        }, this);
+        tip.playTip(message);
 
-        let action = cc.sequence(sleep, callback);
-        this.node.runAction(action);
+        // let sleep = cc.delayTime(0.5);
+        // let callback = cc.callFunc(() => {
+        // }, this);
+
+        // let action = cc.sequence(sleep, callback);
+        // this.node.runAction(action);
     }
 }

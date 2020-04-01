@@ -1,11 +1,10 @@
 export const ProjectConfig = {
     PREFAB_UI_DIR: "prefab/",
+    AUDIO_DIR: "audio/",
 }
 
 export enum WorldNotification {
-    SHOW_LOADING = "SHOW_LOADING",
-    HIDE_LOADING = "HIDE_LOADING",
-    SHOW_TIPS = "SHOW_TIPS",
+    RUN_LAUNCH = "RUN_LAUNCH",
 
 }
 
@@ -33,25 +32,25 @@ export enum GameAction {
 }
 
 export enum PlayerStatus {
-    START,
+    DEFAULT,
     LEAVE,
     OFFLINE,
     GIVEUP,
-    WIN,
-    LOSE,
-}
-
-export enum RoomStartAction {
-    DEFAULT = 0,
-    CREATE,
-    JOIN,
-    MATCH,
 }
 
 export enum RoomStatus {
-    WAIT = "WAIT",
-    START = "START",
-    END = "END",
+    DEFAULT = 0,
+    MATCH_ING,
+    MATCH_WILL,
+    MATCH_SUCC,
+    TEAM,
+    GAME_ING,
+    GAME_END,
+}
+
+export enum GameStatus {
+    DEFAULT,
+    END,
 }
 
 export enum GameType {

@@ -1,15 +1,10 @@
 import { RoomVO } from "./vo/RoomVO";
-import { RoomNotification, GameType, RoomStatus, WorldNotification, GameNotification, WallType, GameAction, PlayerStatus } from "../Constants";
+import { WallType, PlayerStatus, GameStatus, RoomStatus } from "../Constants";
 import Util from "../util/Util";
-import UserProxy from "./UserProxy";
 import { GameVO, PlayerVO, Position, WallVO } from "./vo/GameVO";
 
-// 只需要在使用 MGOBE 之前 import 一次该文件
-import "../library/mgobe/MGOBE.js";
-import MgobeService from "../services/mgobe/MgobeService";
 import RoomProxy from "./RoomProxy";
 // 直接使用 MGOBE
-const { Room, Listener, ErrCode, ENUM, DebuggerLog } = MGOBE;
 
 export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
     public static NAME: string = "GameProxy";
@@ -65,39 +60,80 @@ export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
         }
     }
 
-    public isEnd() {
+    public checkEnd() {
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+
         let playerMaxNum = Util.getPlayerCntByType(this.game.gameType);
+        // 只要有一个到达，就算结束
         for (let i = 0; i < playerMaxNum; i++) {
-            if (this.game.playersInfo[i].status == PlayerStatus.WIN) {
-                return true;
+            if (this.game.playersInfo[i].result != 0) {
+                this.game.status = GameStatus.END;
+                roomProxy.setRoomStatus(RoomStatus.GAME_END);
+                this.game.nowPlayerID = "";
+                return;
             }
+        }
+
+        let onlineNum = 0;
+        let player: PlayerVO;
+        for (let i = 0; i < playerMaxNum; i++) {
+            if (this.game.playersInfo[i].status == PlayerStatus.DEFAULT
+                || this.game.playersInfo[i].status == PlayerStatus.OFFLINE) {
+                onlineNum++;
+                player = this.game.playersInfo[i];
+            }
+        }
+        if (onlineNum <= 1) {
+            this.game.status = GameStatus.END;
+            roomProxy.setRoomStatus(RoomStatus.GAME_END);
+            this.game.nowPlayerID = "";
+            player.result = 1;
         }
     }
 
-    public changeNowPlayer() {
+    public changeNowPlayer(time: number) {
         console.log("切换玩家");
+        if (this.game.nowPlayerID == "") {
+            return;
+        }
         let playerMaxNum = Util.getPlayerCntByType(this.game.gameType);
         let idx = 0;
         for (let i = 0; i < playerMaxNum; i++) {
-            if (this.game.playersInfo[i].status == PlayerStatus.WIN) {
-                return;
-            }
             if (this.game.nowPlayerID == this.game.playersInfo[i].playerID) {
                 idx = i;
             }
         }
-        // let newIdx = (idx + 1) % playerMaxNum;
 
-        let newIdx;
-        do {
-            newIdx = (idx + 1) % playerMaxNum;
-        } while (this.game.playersInfo[newIdx].status == PlayerStatus.GIVEUP
-            || this.game.playersInfo[newIdx].status == PlayerStatus.LEAVE);
-        this.game.nowPlayerID = this.game.playersInfo[newIdx].playerID;
-        this.game.nowActionStartTime = Date.parse(new Date().toString());
+        for (let i = 1; i < playerMaxNum; i++) {
+            let newIdx = (idx + i) % playerMaxNum;
+            if (this.game.playersInfo[newIdx].result == 0
+                && (this.game.playersInfo[newIdx].status == PlayerStatus.DEFAULT
+                    || this.game.playersInfo[newIdx].status == PlayerStatus.OFFLINE)
+                && this.game.status != GameStatus.END) {
+                this.game.nowPlayerID = this.game.playersInfo[newIdx].playerID;
+                this.game.nowActionStartTime = time;
+                break;
+            }
+        }
     }
 
-    public setPlayerStatus(playerId, status) {
+    public setPlayerResult(playerId: string, result: number) {
+        this.game.playersInfo.forEach((player) => {
+            if (player.playerID == playerId) {
+                player.result = result;
+            }
+        });
+    }
+
+    public getMaxPlayerResult(): number {
+        let maxResult = 0;
+        this.game.playersInfo.forEach((player) => {
+            maxResult = Math.max(maxResult, player.result);
+        });
+        return maxResult;
+    }
+
+    public setPlayerStatus(playerId: string, status) {
         this.game.playersInfo.forEach((player) => {
             if (player.playerID == playerId) {
                 player.status = status;
@@ -106,8 +142,12 @@ export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
     }
 
     public createGame(room: RoomVO) {
+        const roomProxy = this.facade.retrieveProxy(RoomProxy.NAME) as RoomProxy;
+        roomProxy.setRoomStatus(RoomStatus.GAME_ING);
+
         let playerMaxNum = Util.getPlayerCntByType(room.gameType);
 
+        this.game = new GameVO();
         this.game.walls = [];
         this.game.gameType = room.gameType;
         this.game.mePlayerIdx = room.mePlayerIdx;
@@ -144,7 +184,7 @@ export default class GameProxy extends puremvc.Proxy implements puremvc.IProxy {
                 gamePlayer.playerID = roomPlayer.playerID;
                 gamePlayer.wallLeftCnt = playerMaxNum == 2 ? 10 : 5;
                 gamePlayer.chessPosition = positions[i];
-                gamePlayer.status = PlayerStatus.START;
+                gamePlayer.status = PlayerStatus.DEFAULT;
             }
         }
         console.log("游戏创建", this.game);

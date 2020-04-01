@@ -6,11 +6,17 @@ export class Tip extends cc.Component {
     private tipLabel: cc.Label = null;
     private ready: boolean = true;
 
+    onLoad() {
+        this.node.active = false;
+    }
+
     public playTip(message: string) {
         this.node.stopAllActions();
         this.ready = false;
         this.tipLabel.string = message;
         this.reset();
+        this.node.active = true;
+
         let action0 = cc.moveTo(0.5, 0, 128);
         let action1 = cc.fadeIn(0.5);
         let action2 = cc.spawn(action0, action1);

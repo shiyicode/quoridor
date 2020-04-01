@@ -1,0 +1,33 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "match",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 1,
+  "sample": 240,
+  "speed": 1,
+  "wrapMode": 2,
+  "curveData": {
+    "props": {
+      "x": []
+    },
+    "paths": {
+      "match_bg/matching/headList": {
+        "comps": {},
+        "props": {
+          "x": [
+            {
+              "frame": 0,
+              "value": -114
+            },
+            {
+              "frame": 1,
+              "value": -576.15
+            }
+          ]
+        }
+      }
+    }
+  },
+  "events": []
+}

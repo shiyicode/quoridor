@@ -44,4 +44,9 @@ export default class Util {
         });
         cc.director.loadScene(scene);
     }
+
+    static random(min, max) {
+        return Math.round(Math.random() * (max - min)) + min;
+    }
+
 }

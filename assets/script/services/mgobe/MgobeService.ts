@@ -48,7 +48,6 @@ export default class MgobeService {
 
     static getMyRoom(callback?: (event) => any) {
         MGOBE.Room.getMyRoom(event => {
-            console.log("获取当前房间信息", event);
             if (event.code === MGOBE.ErrCode.EC_OK) {
                 this.room.roomInfo = event.data.roomInfo;
 
@@ -155,13 +154,13 @@ export default class MgobeService {
         });
     }
 
-    static changeRoomStatus(roomStatus: RoomStatus) {
-        const changeRoomPara = {
-            customProperties: roomStatus,
-        };
+    // static changeRoomStatus(roomStatus: RoomStatus) {
+    //     const changeRoomPara = {
+    //         customProperties: roomStatus as string,
+    //     };
 
-        this.room.changeRoom(changeRoomPara, event => console.log("changeRoom", roomStatus, event));
-    }
+    //     this.room.changeRoom(changeRoomPara, event => console.log("changeRoom", roomStatus, event));
+    // }
 
     static changeCustomPlayerStatus(customPlayerStatus, callback?: (event) => any) {
         const changeCustomPlayerStatusPara = {
@@ -208,14 +207,11 @@ export default class MgobeService {
         // 初始化
         MGOBE.Listener.init(gameInfo, config, event => {
             if (event.code === MGOBE.ErrCode.EC_OK) {
-                console.log("初始化成功");
                 // 初始化后才能添加监听
                 this.room = new MGOBE.Room();
                 MGOBE.Listener.add(this.room);
                 // 设置默认广播
                 this.setBroadcastCallbacks(null, {});
-            } else {
-                console.log("初始化失败", event.code);
             }
             callback && callback({ code: event.code });
         });

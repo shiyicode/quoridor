@@ -19,7 +19,11 @@ export default class DevPlatform implements IPlatform {
         return DevPlatform.mockOpenId;
     }
 
-    async authorize() {
+    async authSettingOfUserInfo() {
+        return true;
+    }
+
+    async createUserInfoButton() {
 
     }
 
@@ -35,7 +39,7 @@ export default class DevPlatform implements IPlatform {
         };
     }
 
-    async shareAppMessage(title: string, imageUrl: string, query: string) {
+    async shareAppMessage(title: string, imageUrl: string, imageUrlId: string, query: string) {
         console.log("share app message:", query);
     }
 
@@ -62,12 +66,10 @@ export default class DevPlatform implements IPlatform {
         console.log("隐藏Toast");
     }
 
-    showModal() {
-        console.log("展示Modal");
-        console.log("忽略已进行中的游戏");
-        const roomProxy = AppFacade.getInstance().retrieveProxy(RoomProxy.NAME) as RoomProxy;
-
-        roomProxy.leaveRoom();
+    showModal(title:string, callback: (isConfirm: boolean) => any, content?:string, showCancel?:any, confirmText?: any,
+    cancelText?: any) {
+        console.log("展示Modal", title);
+        callback && callback(true);
     }
 
     hideModal() {

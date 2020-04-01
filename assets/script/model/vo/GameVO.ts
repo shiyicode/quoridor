@@ -9,6 +9,7 @@ export class GameVO {
     mePlayerIdx: number;
     walls: Array<WallVO>;
     playersInfo: Array<PlayerVO>;
+    status: number;
 
     public constructor() {
         this.nowPlayerID = "";
@@ -30,7 +31,8 @@ export class PlayerVO {
     avatarUrl: string = "";
     nickName: string = "";
     status: number = 0;
-    value: number = 0;
+    result: number = 0; // 游戏结果
+    value: number = 0;  // TODO 玩家分数，暂时摆设
     public constructor() {
         this.chessPosition = new Position();
     }
