@@ -24,7 +24,11 @@
 ![match](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0654.PNG)
 
 ### 二人游戏
-![welcome](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0660.PNG)
+![game](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0661.PNG)
+
+![game](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0662.PNG)
+
+![game](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0663.PNG)
 
 
 ## 研发工具
