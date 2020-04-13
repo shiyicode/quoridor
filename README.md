@@ -1,8 +1,38 @@
 # quoridor
 
-## 帮助
+## 游戏体验
 
-### 游戏介绍
+### 微信小游戏端
+
+![wechat](https://github.com/shiyicode/quoridor/blob/master/readme-image/wechat_play.JPG)
+
+## 游戏预览
+
+### 欢迎场景
+![welcome](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0660.PNG)
+
+### 菜单场景
+![menu](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0660.PNG)
+
+### 帮助场景
+![help](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0653.PNG)
+
+### 好友对战
+![team](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0655.PNG)
+
+### 随机匹配
+![match](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0654.PNG)
+
+### 二人游戏
+![welcome](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0660.PNG)
+
+
+## 研发工具
+- 客户端：cocos creator
+- 服务端：MGBOE小游戏联机对战引擎
+- UI设计：Sketch
+
+## 游戏介绍
 
 ​	墙棋，又名围追堵截、步步为营，英文名为Quoridor。是著名游戏设计师Mirko Marchesi设计的著名游戏，此款游戏也被游戏杂志《game》评为“20世纪最受欢迎的益智游戏”。
 

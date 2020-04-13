@@ -54,7 +54,7 @@
     "height": 640,
     "width": 960
   },
-  "last-module-event-record-time": 1584886606548,
+  "last-module-event-record-time": 1586792306774,
   "assets-sort-type": "name",
   "facebook": {
     "appID": "",
@@ -65,5 +65,6 @@
     "live": {
       "enable": false
     }
-  }
+  },
+  "start-scene": "current"
 }
