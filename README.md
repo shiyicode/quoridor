@@ -12,7 +12,7 @@
 ![welcome](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0660.PNG)
 
 ### 菜单场景
-![menu](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0660.PNG)
+![menu](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0652.PNG)
 
 ### 帮助场景
 ![help](https://github.com/shiyicode/quoridor/blob/master/readme-image/IMG_0653.PNG)
